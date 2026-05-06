@@ -1,4 +1,6 @@
-# Meeting Intelligence Engine
+# Recall — Meeting Intelligence Engine
+
+[![CI](https://github.com/karvanitis/recall-mie/actions/workflows/ci.yml/badge.svg)](https://github.com/karvanitis/recall-mie/actions/workflows/ci.yml)
 
 Turn company meetings into a searchable memory layer.
 
@@ -63,6 +65,19 @@ Not implemented yet:
 - object storage like S3 / MinIO
 - production deployment stack
 
+## Grounding and Answer Behavior
+
+This system is designed to answer from **stored meeting evidence**, not from generic model knowledge.
+
+Current answer behavior:
+
+- retrieval pulls transcript-backed context from the indexed meeting store;
+- answers are generated against that retrieved evidence;
+- the system should prefer incomplete or uncertain answers over invented decisions or assignments;
+- source chunks are part of the retrieval flow so answers can be inspected against the underlying meeting text.
+
+That matters because a wrong answer in a meeting memory product is not a cosmetic problem. It can misstate a decision, invent an owner, or rewrite what a team actually agreed to do. The intended failure mode is therefore **visible uncertainty**, not confident fabrication.
+
 ## Architecture
 
 ```text
@@ -121,6 +136,22 @@ System components:
 - diarization: pyannote
 - analytics / answer generation: Groq chat models
 
+## Tech Stack Decisions
+
+| Area | Choice | Why | Tradeoff |
+| --- | --- | --- | --- |
+| API/UI | FastAPI + server-rendered static UI | Fast local iteration, simple deployment shape, easy file upload and JSON APIs | Not as polished as a dedicated frontend stack |
+| Background jobs | Celery + Redis | Long ASR and indexing jobs should not block request handling | Adds operational moving parts |
+| Relational store | PostgreSQL | Durable meeting metadata, transcripts, analytics, and job state | More setup than a local-only prototype |
+| ASR | Groq Whisper `whisper-large-v3` | Strong hosted Whisper baseline with simple integration and no local ASR serving burden | Less decoding control than a local WhisperX-style stack |
+| Diarization | pyannote | Strong open diarization baseline with real speaker segmentation quality | HF gating, heavier runtime, and GPU dependency |
+| Segment repair | Rule-based heuristics | Cheap, predictable fixes for broken turns and split introductions | Heuristics do not generalize as broadly as learned correction |
+| Speaker naming | Rules first, LLM fallback second | Keeps naming conservative and reduces guesswork | Still limited when speakers never self-identify |
+| Analytics extraction | Groq structured JSON prompting | Fast way to extract action items, decisions, and topics without training a custom model | Output quality depends on prompt discipline and transcript quality |
+| Vector store | Qdrant | Solid hybrid retrieval support and simple local deployment | Extra infrastructure compared with pure keyword search |
+| Embeddings | Ollama `nomic-embed-text` | Fully local dense embeddings, easy to run alongside the app | Lower convenience than hosted embedding APIs |
+| Retrieval corpus | Transcript Markdown | Simple, inspectable source format that matches how meetings are stored and exported | No richer document graph or schema-aware retrieval yet |
+
 ## Evaluation
 
 The current ASR benchmark is run on the **AMI Meeting Corpus Mix-Headset** setup, which is the closest fit to the product target here: one mixed meeting recording with multiple speakers, overlap, interruptions, and conversational speech.
@@ -139,6 +170,8 @@ Best / worst meetings:
 `filler-light WER` is reported as a secondary conversational metric. It removes obvious fillers such as `uh`, `um`, and `mm`, plus immediate duplicate tokens, to reduce mismatch between usable ASR output and filler-heavy manual annotations. Raw WER remains the main benchmark.
 
 These numbers are materially higher than clean single-speaker benchmarks for a simple reason: this is **mixed multi-speaker meeting audio**, not isolated headset speech. Overlap, turn-taking, disfluencies, and annotation mismatch all make raw word-level scoring harsher. Even when raw WER is imperfect, the resulting transcripts are still often good enough to preserve the main discussion content for retrieval, action extraction, and cross-meeting search.
+
+Current RAG quality is demonstrated functionally, not benchmarked as rigorously as ASR yet. The retrieval path is grounded in stored transcript chunks and exposed through the product, but a fixed QA evaluation set is still the next step if we want quantitative retrieval metrics.
 
 ## Batch-First Design
 
@@ -249,11 +282,11 @@ For production use, the next layer should include:
 
 In other words: the core AI pipeline is implemented, but privacy, governance, and compliance controls still need to be added deliberately rather than implied.
 
-## Remaining Gaps
+## Out of Scope for This Version
 
-The current repo is a strong end-to-end prototype, but it is not a finished production product yet.
+The current repo is a strong end-to-end prototype. The items below are deliberate next-product concerns, not hidden surprises in the current implementation.
 
-The main remaining gaps are:
+Not implemented in this version:
 
 - auth and workspace ownership;
 - production deployment hardening;
