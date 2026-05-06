@@ -76,6 +76,14 @@ Current answer behavior:
 - the system should prefer incomplete or uncertain answers over invented decisions or assignments;
 - source chunks are part of the retrieval flow so answers can be inspected against the underlying meeting text.
 
+This repo intentionally uses a **simple grounded retrieval pipeline** rather than a more agentic RAG strategy. That is a deliberate design choice:
+
+- the corpus is narrow and uniform: transcript markdown, not many heterogeneous sources;
+- the main problem is reliable retrieval over meeting text, not tool orchestration;
+- a direct retrieve-then-answer flow is easier to inspect, easier to evaluate, and less likely to hide reasoning errors behind unnecessary agent loops.
+
+For this project, the engineering tradeoff is to keep the retrieval path explicit and measurable. If the product later expands into multiple data sources, external tools, or more complex multi-step queries, an agentic layer would make more sense then than it does now.
+
 That matters because a wrong answer in a meeting memory product is not a cosmetic problem. It can misstate a decision, invent an owner, or rewrite what a team actually agreed to do. The intended failure mode is therefore **visible uncertainty**, not confident fabrication.
 
 ## Architecture
@@ -171,7 +179,18 @@ Best / worst meetings:
 
 These numbers are materially higher than clean single-speaker benchmarks for a simple reason: this is **mixed multi-speaker meeting audio**, not isolated headset speech. Overlap, turn-taking, disfluencies, and annotation mismatch all make raw word-level scoring harsher. Even when raw WER is imperfect, the resulting transcripts are still often good enough to preserve the main discussion content for retrieval, action extraction, and cross-meeting search.
 
-Current RAG quality is demonstrated functionally, not benchmarked as rigorously as ASR yet. The retrieval path is grounded in stored transcript chunks and exposed through the product, but a fixed QA evaluation set is still the next step if we want quantitative retrieval metrics.
+The retrieval layer is also benchmarked now on a fixed **single-meeting QA set**:
+
+- **50 questions**
+- **5 meetings**
+- **faithfulness**: **94.0%**
+- **answer relevancy**: **74.3%**
+- **context precision**: **78.2%**
+- **context recall**: **83.0%**
+
+These RAG metrics are measured on grounded single-meeting questions over stored transcript markdown, not on open-ended chat. The most important number here is **faithfulness**: the system usually answers from retrieved evidence rather than inventing unsupported content.
+
+The retrieval configuration is intentionally tuned toward cleaner evidence and more direct answers. That improves **context precision** and **answer relevancy**, but gives up some **context recall** compared with a broader retrieve-everything approach. For a meeting memory product, that is the better tradeoff: slightly narrower retrieval is preferable to flooding the answer step with noisy transcript context, as long as faithfulness remains high.
 
 ## Batch-First Design
 
@@ -319,6 +338,7 @@ Required secrets:
 
 ```dotenv
 GROQ_API_KEY=
+OPENAI_API_KEY=
 HF_TOKEN=
 ```
 
@@ -334,7 +354,8 @@ DENSE_MODEL=nomic-embed-text
 MIE_ANALYTICS_ENABLED=true
 MIE_RAG_ENABLED=true
 MIE_ANALYTICS_MODEL_NAME=llama-3.1-8b-instant
-MIE_RAG_MODEL_NAME=llama-3.1-8b-instant
+MIE_RAG_MODEL_NAME=llama-3.3-70b-versatile
+MIE_RAG_EVAL_JUDGE_MODEL=gpt-4.1-mini
 ```
 
 The Hugging Face account behind `HF_TOKEN` must have accepted the gated `pyannote/speaker-diarization-3.1` terms.
