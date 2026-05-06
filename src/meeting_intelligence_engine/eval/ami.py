@@ -8,11 +8,16 @@ import subprocess
 import xml.etree.ElementTree as ET
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
+from uuid import UUID
 from zipfile import ZipFile
 
 from meeting_intelligence_engine.audio import extract_audio_range, normalize_audio, probe_duration, require_ffmpeg, validate_audio
 from meeting_intelligence_engine.config import Settings
+from meeting_intelligence_engine.exporters import write_transcript_outputs
 from meeting_intelligence_engine.implementations.local_pipeline import GroqWhisperASR, resolve_device
+from meeting_intelligence_engine.services.pipeline_factory import build_pipeline
+from meeting_intelligence_engine.services.segment_repairs import repair_intro_fragments
+from meeting_intelligence_engine.services.speaker_labels import apply_speaker_labels, infer_speaker_labels
 
 
 FILLER_TOKENS = {
@@ -454,6 +459,43 @@ def evaluate_ami_meeting(
         transcript_sources=transcript_sources,
         chunk_ranges=[f"{chunk.start:.2f}-{chunk.end:.2f}" for chunk in chunks],
     )
+
+
+def save_ami_transcript_artifacts(
+    meeting_id: str,
+    work_dir: Path,
+    settings: Settings,
+) -> None:
+    """Run the full transcription pipeline on the already-normalised eval audio and
+    write transcript artefacts (json, md, txt, srt) to
+    ``{settings.data_dir}/meetings/{meeting_id}/transcript/transcript.*``.
+
+    The normalised ``.eval.wav`` produced during :func:`transcribe_audio_for_eval`
+    is reused so we avoid transcoding the audio a second time.
+    """
+    normalised_path = work_dir / meeting_id / f"{meeting_id}.Mix-Headset.eval.wav"
+    if not normalised_path.exists():
+        raise FileNotFoundError(
+            f"Normalised audio not found at {normalised_path}. "
+            "Run evaluate_ami_meeting first."
+        )
+    pipeline = build_pipeline(settings)
+    transcript = pipeline.process(normalised_path, meeting_id=UUID(int=0, version=4))  # dummy UUID – overridden below
+    # Give the transcript the AMI meeting_id as a stable UUID-like identifier by
+    # encoding the ASCII meeting_id string into the UUID namespace.
+    import uuid as _uuid
+    stable_id = _uuid.uuid5(_uuid.NAMESPACE_DNS, meeting_id)
+    # Pydantic model is frozen-ish; rebuild via dict mutation.
+    data = transcript.model_dump()
+    data["meeting_id"] = stable_id
+    from meeting_intelligence_engine.core.schemas import TranscriptResult
+    transcript = TranscriptResult.model_validate(data)
+    repair_intro_fragments(transcript)
+    apply_speaker_labels(transcript, infer_speaker_labels(transcript, settings))
+    out_base = settings.data_dir / "meetings" / meeting_id / "transcript" / "transcript"
+    out_base.parent.mkdir(parents=True, exist_ok=True)
+    write_transcript_outputs(out_base, transcript, export_srt=True, meeting_title=meeting_id)
+    print(f"  saved transcript artefacts → {out_base}.md", flush=True)
 
 
 def evaluate_ami_meetings(

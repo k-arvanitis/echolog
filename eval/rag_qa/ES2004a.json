@@ -1,0 +1,55 @@
+{
+  "meeting_id": "ES2004a",
+  "qa_pairs": [
+    {
+      "id": "q1",
+      "question": "Who opened the first meeting as project manager?",
+      "gold_answer": "Sarah opened the meeting and identified herself as project manager."
+    },
+    {
+      "id": "q2",
+      "question": "What usability goal did Sarah set for the remote?",
+      "gold_answer": "It should be user-friendly enough for a wide range of users, from grannies to kids, maybe even dogs."
+    },
+    {
+      "id": "q3",
+      "question": "What were the stated selling price, production cost, and profit aim?",
+      "gold_answer": "Selling price was 25 euros, production cost was 12.50 euros, and profit aim was 50 million euros in the first year."
+    },
+    {
+      "id": "q4",
+      "question": "What was Sarah’s experience with a universal remote at home?",
+      "gold_answer": "Her family’s universal remote kept losing signals and had to be reprogrammed every now and again."
+    },
+    {
+      "id": "q5",
+      "question": "What basic functions did Little say they personally used on remotes?",
+      "gold_answer": "On/off, volume up/down, and basic channel selection."
+    },
+    {
+      "id": "q6",
+      "question": "What button-layout idea did Sarah suggest to reduce visible complexity?",
+      "gold_answer": "Keep the main controls on the front, with another section opening for secondary functions."
+    },
+    {
+      "id": "q7",
+      "question": "Who suggested using a menu display like on a mobile phone?",
+      "gold_answer": "Little suggested using a small LCD menu display, and another speaker agreed."
+    },
+    {
+      "id": "q8",
+      "question": "Did the team decide to use a color screen or advanced phone-like interface?",
+      "gold_answer": "No. They discussed the idea, but did not decide to use a color screen or phone-like interface."
+    },
+    {
+      "id": "q9",
+      "question": "What action did Sarah assign at the end of the meeting?",
+      "gold_answer": "Sarah told everyone to do their individual work and come back in half an hour."
+    },
+    {
+      "id": "q10",
+      "question": "Near the end, why did one speaker argue that the design needed to be fashionable?",
+      "gold_answer": "Because the company website said, “we put the fashion into electronics.”"
+    }
+  ]
+}

@@ -24,6 +24,11 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["httpx>=0.28.0", "pytest>=8.0.0", "ruff>=0.11.0"]
+eval = [
+    "langchain-groq>=0.3.7",
+    "langchain-ollama>=0.3.3",
+    "ragas>=0.4.3",
+]
 
 [project.scripts]
 meeting-transcribe = "meeting_intelligence_engine.cli:main"
@@ -31,6 +36,7 @@ meeting-api = "meeting_intelligence_engine.api.main:main"
 meeting-worker = "meeting_intelligence_engine.workers.worker:main"
 mie-ingest-md = "meeting_intelligence_engine.rag.ingest:main"
 mie-eval-ami = "meeting_intelligence_engine.eval.cli:main"
+mie-eval-rag = "meeting_intelligence_engine.eval.rag_cli:main"
 
 [build-system]
 requires = ["hatchling"]

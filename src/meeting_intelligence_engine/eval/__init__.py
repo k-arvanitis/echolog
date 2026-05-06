@@ -10,6 +10,16 @@ from .ami import (
     write_eval_json_with_failures,
     word_error_rate,
 )
+from .rag import (
+    RAGEvaluationRow,
+    RAGMeetingQASet,
+    RAGQAPair,
+    build_rag_eval_summary,
+    evaluate_rag_qa_sets,
+    load_rag_qa_file,
+    load_rag_qa_sets,
+    write_rag_eval_json,
+)
 
 __all__ = [
     "AMIEvaluationResult",
@@ -22,4 +32,12 @@ __all__ = [
     "select_ami_meetings",
     "write_eval_json_with_failures",
     "word_error_rate",
+    "RAGEvaluationRow",
+    "RAGMeetingQASet",
+    "RAGQAPair",
+    "build_rag_eval_summary",
+    "evaluate_rag_qa_sets",
+    "load_rag_qa_file",
+    "load_rag_qa_sets",
+    "write_rag_eval_json",
 ]

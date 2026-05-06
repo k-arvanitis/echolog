@@ -1,0 +1,277 @@
+[
+  {
+    "meeting_id": "ES2016b",
+    "qa_pairs": [
+      {
+        "id": "q1",
+        "question": "Who was assigned to keep the meeting notes and prepare the final presentation?",
+        "gold_answer": "The project lead said they would lead the meetings, keep the notes, and prepare the final presentation."
+      },
+      {
+        "id": "q2",
+        "question": "What did the team decide in the previous meeting about the basic form factor of the remote?",
+        "gold_answer": "They had decided it should probably be one-handed."
+      },
+      {
+        "id": "q3",
+        "question": "What market finding supported focusing on a more attractive remote design?",
+        "gold_answer": "75% found their remotes ugly, and 80% would pay more for a fancy-looking remote."
+      },
+      {
+        "id": "q4",
+        "question": "Which remote-control functions did the marketing report say were practically never used?",
+        "gold_answer": "Audio settings, screen settings, and channel settings were practically never used."
+      },
+      {
+        "id": "q5",
+        "question": "Who argued that a fully universal remote would be difficult and might add buttons?",
+        "gold_answer": "Ryan argued that a universal remote would be difficult, possibly over budget, and would add buttons."
+      },
+      {
+        "id": "q6",
+        "question": "What were the new constraints received from the company for the remote?",
+        "gold_answer": "It should be only for television, have no teletext, and use the corporate color/slogan: gray and yellow, with “we put the fashion in electronics.”"
+      },
+      {
+        "id": "q7",
+        "question": "Did the team clearly approve speech recognition for the final remote concept?",
+        "gold_answer": "No. The team leaned against speech recognition and suggested dropping it."
+      },
+      {
+        "id": "q8",
+        "question": "What locator idea did Ryan propose?",
+        "gold_answer": "Ryan proposed a holder or holster with a button that would make the remote beep so it could be found."
+      },
+      {
+        "id": "q9",
+        "question": "What design work was Ryan asked to do before the next meeting?",
+        "gold_answer": "Ryan was asked to work on how both explored concepts would work with the user."
+      },
+      {
+        "id": "q10",
+        "question": "Near the end, which two concepts did the group plan to explore next?",
+        "gold_answer": "They planned to explore a rounded hand-fitting remote and the possibility of a two-piece design, including a quick-zapping part."
+      }
+    ]
+  },
+  {
+    "meeting_id": "ES2010a",
+    "qa_pairs": [
+      {
+        "id": "q1",
+        "question": "Who introduced herself as the project manager?",
+        "gold_answer": "Mandy introduced herself as the project manager."
+      },
+      {
+        "id": "q2",
+        "question": "What product was the team asked to design?",
+        "gold_answer": "A new remote control that is original, trendy, and user-friendly."
+      },
+      {
+        "id": "q3",
+        "question": "What financial and market constraints were given?",
+        "gold_answer": "The remote should sell for 25 euros, target 50 million euros profit, be marketed internationally in the States, Europe and Asia, and cost at most 12.50 euros to produce."
+      },
+      {
+        "id": "q4",
+        "question": "What scope did the team initially want for the remote?",
+        "gold_answer": "They wanted a multifunctional remote, one remote for everything."
+      },
+      {
+        "id": "q5",
+        "question": "Which devices were mentioned as part of “everything” for the multifunctional remote?",
+        "gold_answer": "Sound system, TV, DVD, and VHS were mentioned."
+      },
+      {
+        "id": "q6",
+        "question": "What problem was raised about universal remotes?",
+        "gold_answer": "They are never truly universal and may require reconfiguration."
+      },
+      {
+        "id": "q7",
+        "question": "What ergonomic idea did someone suggest for the shape?",
+        "gold_answer": "A curvature matching the hand."
+      },
+      {
+        "id": "q8",
+        "question": "Did the team decide on the exact battery type?",
+        "gold_answer": "No. They discussed AA, AAA, and lithium options, but did not choose a battery type."
+      },
+      {
+        "id": "q9",
+        "question": "What individual work was assigned to the industrial designer?",
+        "gold_answer": "The industrial designer was assigned to think about the working design."
+      },
+      {
+        "id": "q10",
+        "question": "When was the next meeting scheduled to start?",
+        "gold_answer": "In 30 minutes."
+      }
+    ]
+  },
+  {
+    "meeting_id": "ES2013a",
+    "qa_pairs": [
+      {
+        "id": "q1",
+        "question": "What was the purpose of the meeting?",
+        "gold_answer": "It was the kickoff meeting for a new group creating a new remote control for Real Reaction."
+      },
+      {
+        "id": "q2",
+        "question": "What three qualities did the new remote control need to have?",
+        "gold_answer": "It needed to be original, trendy, and user-friendly."
+      },
+      {
+        "id": "q3",
+        "question": "Who was associated with user friendliness in the project roles?",
+        "gold_answer": "Steph was associated with user friendliness."
+      },
+      {
+        "id": "q4",
+        "question": "What financial target did the group discuss for the remote?",
+        "gold_answer": "The remote should sell for 25 euros, with a profit aim of 50 million euros."
+      },
+      {
+        "id": "q5",
+        "question": "What production cost limit was given per unit?",
+        "gold_answer": "Production should cost only 12.5 euros per item."
+      },
+      {
+        "id": "q6",
+        "question": "How many remotes did the group estimate they would need to sell to reach the profit target?",
+        "gold_answer": "They estimated they would need to sell about four million remotes."
+      },
+      {
+        "id": "q7",
+        "question": "Did the group decide whether the remote was only for television?",
+        "gold_answer": "No. The group raised the question, but did not decide whether the remote was only for television."
+      },
+      {
+        "id": "q8",
+        "question": "What design direction did Kate suggest regarding buttons?",
+        "gold_answer": "Kate suggested avoiding lots of superfluous functions and unnecessary buttons."
+      },
+      {
+        "id": "q9",
+        "question": "What menu-based idea was suggested for simplifying controls?",
+        "gold_answer": "They suggested simplifying controls with menu-based choices, similar to an iPod interface."
+      },
+      {
+        "id": "q10",
+        "question": "What did the project manager decide about ending the meeting and next work?",
+        "gold_answer": "They decided not to prolong the meeting and to move into individual instructions/work."
+      }
+    ]
+  },
+  {
+    "meeting_id": "ES2008a",
+    "qa_pairs": [
+      {
+        "id": "q1",
+        "question": "Who was the project manager for this meeting?",
+        "gold_answer": "Rose Lindgren was the project manager."
+      },
+      {
+        "id": "q2",
+        "question": "What were the three stated goals for the new remote control?",
+        "gold_answer": "It needed to be original, trendy, and user-friendly."
+      },
+      {
+        "id": "q3",
+        "question": "What was Alima’s role in the project?",
+        "gold_answer": "Alima was the industrial designer."
+      },
+      {
+        "id": "q4",
+        "question": "What price and production-cost constraints did Rose give?",
+        "gold_answer": "The remote should sell for about 25 euros and cost at most 12.50 euros to produce."
+      },
+      {
+        "id": "q5",
+        "question": "What problem did Jessie describe with current TV remotes?",
+        "gold_answer": "Jessie disliked having to press several different buttons just to turn on the TV and felt combined remotes could create multimedia overload."
+      },
+      {
+        "id": "q6",
+        "question": "What feature did Jessie suggest for lost remotes?",
+        "gold_answer": "A device to help find the remote."
+      },
+      {
+        "id": "q7",
+        "question": "What did Ian say he mainly wanted to do with a remote?",
+        "gold_answer": "Switch on and off and change channel."
+      },
+      {
+        "id": "q8",
+        "question": "Did the group clearly decide whether the product was TV-only or included video-recorder functions?",
+        "gold_answer": "No. They raised the question, but did not decide whether the remote was TV-only or included video-recorder functions."
+      },
+      {
+        "id": "q9",
+        "question": "What compromise was suggested between one overloaded remote and many separate remotes?",
+        "gold_answer": "Keep main functions like on/off, channel and volume on the normal remote, and put special functions elsewhere or separately."
+      },
+      {
+        "id": "q10",
+        "question": "What follow-up did Rose say she would do after the meeting?",
+        "gold_answer": "Rose said she would type up the minutes and probably email them to everyone."
+      }
+    ]
+  },
+  {
+    "meeting_id": "ES2004a",
+    "qa_pairs": [
+      {
+        "id": "q1",
+        "question": "Who opened the first meeting as project manager?",
+        "gold_answer": "Sarah opened the meeting and identified herself as project manager."
+      },
+      {
+        "id": "q2",
+        "question": "What usability goal did Sarah set for the remote?",
+        "gold_answer": "It should be user-friendly enough for a wide range of users, from grannies to kids, maybe even dogs."
+      },
+      {
+        "id": "q3",
+        "question": "What were the stated selling price, production cost, and profit aim?",
+        "gold_answer": "Selling price was 25 euros, production cost was 12.50 euros, and profit aim was 50 million euros in the first year."
+      },
+      {
+        "id": "q4",
+        "question": "What was Sarah’s experience with a universal remote at home?",
+        "gold_answer": "Her family’s universal remote kept losing signals and had to be reprogrammed every now and again."
+      },
+      {
+        "id": "q5",
+        "question": "What basic functions did Little say they personally used on remotes?",
+        "gold_answer": "On/off, volume up/down, and basic channel selection."
+      },
+      {
+        "id": "q6",
+        "question": "What button-layout idea did Sarah suggest to reduce visible complexity?",
+        "gold_answer": "Keep the main controls on the front, with another section opening for secondary functions."
+      },
+      {
+        "id": "q7",
+        "question": "Who suggested using a menu display like on a mobile phone?",
+        "gold_answer": "Little suggested using a small LCD menu display, and another speaker agreed."
+      },
+      {
+        "id": "q8",
+        "question": "Did the team decide to use a color screen or advanced phone-like interface?",
+        "gold_answer": "No. They discussed the idea, but did not decide to use a color screen or phone-like interface."
+      },
+      {
+        "id": "q9",
+        "question": "What action did Sarah assign at the end of the meeting?",
+        "gold_answer": "Sarah told everyone to do their individual work and come back in half an hour."
+      },
+      {
+        "id": "q10",
+        "question": "Near the end, why did one speaker argue that the design needed to be fashionable?",
+        "gold_answer": "Because the company website said, “we put the fashion into electronics.”"
+      }
+    ]
+  }
+]

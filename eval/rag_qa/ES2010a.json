@@ -1,0 +1,55 @@
+{
+  "meeting_id": "ES2010a",
+  "qa_pairs": [
+    {
+      "id": "q1",
+      "question": "Who introduced herself as the project manager?",
+      "gold_answer": "Mandy introduced herself as the project manager."
+    },
+    {
+      "id": "q2",
+      "question": "What product was the team asked to design?",
+      "gold_answer": "A new remote control that is original, trendy, and user-friendly."
+    },
+    {
+      "id": "q3",
+      "question": "What financial and market constraints were given?",
+      "gold_answer": "The remote should sell for 25 euros, target 50 million euros profit, be marketed internationally in the States, Europe and Asia, and cost at most 12.50 euros to produce."
+    },
+    {
+      "id": "q4",
+      "question": "What scope did the team initially want for the remote?",
+      "gold_answer": "They wanted a multifunctional remote, one remote for everything."
+    },
+    {
+      "id": "q5",
+      "question": "Which devices were mentioned as part of “everything” for the multifunctional remote?",
+      "gold_answer": "Sound system, TV, DVD, and VHS were mentioned."
+    },
+    {
+      "id": "q6",
+      "question": "What problem was raised about universal remotes?",
+      "gold_answer": "They are never truly universal and may require reconfiguration."
+    },
+    {
+      "id": "q7",
+      "question": "What ergonomic idea did someone suggest for the shape?",
+      "gold_answer": "A curvature matching the hand."
+    },
+    {
+      "id": "q8",
+      "question": "Did the team decide on the exact battery type?",
+      "gold_answer": "No. They discussed AA, AAA, and lithium options, but did not choose a battery type."
+    },
+    {
+      "id": "q9",
+      "question": "What individual work was assigned to the industrial designer?",
+      "gold_answer": "The industrial designer was assigned to think about the working design."
+    },
+    {
+      "id": "q10",
+      "question": "When was the next meeting scheduled to start?",
+      "gold_answer": "In 30 minutes."
+    }
+  ]
+}

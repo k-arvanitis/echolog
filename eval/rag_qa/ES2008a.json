@@ -1,0 +1,55 @@
+{
+  "meeting_id": "ES2008a",
+  "qa_pairs": [
+    {
+      "id": "q1",
+      "question": "Who was the project manager for this meeting?",
+      "gold_answer": "Rose Lindgren was the project manager."
+    },
+    {
+      "id": "q2",
+      "question": "What were the three stated goals for the new remote control?",
+      "gold_answer": "It needed to be original, trendy, and user-friendly."
+    },
+    {
+      "id": "q3",
+      "question": "What was Alima’s role in the project?",
+      "gold_answer": "Alima was the industrial designer."
+    },
+    {
+      "id": "q4",
+      "question": "What price and production-cost constraints did Rose give?",
+      "gold_answer": "The remote should sell for about 25 euros and cost at most 12.50 euros to produce."
+    },
+    {
+      "id": "q5",
+      "question": "What problem did Jessie describe with current TV remotes?",
+      "gold_answer": "Jessie disliked having to press several different buttons just to turn on the TV and felt combined remotes could create multimedia overload."
+    },
+    {
+      "id": "q6",
+      "question": "What feature did Jessie suggest for lost remotes?",
+      "gold_answer": "A device to help find the remote."
+    },
+    {
+      "id": "q7",
+      "question": "What did Ian say he mainly wanted to do with a remote?",
+      "gold_answer": "Switch on and off and change channel."
+    },
+    {
+      "id": "q8",
+      "question": "Did the group clearly decide whether the product was TV-only or included video-recorder functions?",
+      "gold_answer": "No. They raised the question, but did not decide whether the remote was TV-only or included video-recorder functions."
+    },
+    {
+      "id": "q9",
+      "question": "What compromise was suggested between one overloaded remote and many separate remotes?",
+      "gold_answer": "Keep main functions like on/off, channel and volume on the normal remote, and put special functions elsewhere or separately."
+    },
+    {
+      "id": "q10",
+      "question": "What follow-up did Rose say she would do after the meeting?",
+      "gold_answer": "Rose said she would type up the minutes and probably email them to everyone."
+    }
+  ]
+}

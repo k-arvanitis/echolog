@@ -1,0 +1,55 @@
+{
+  "meeting_id": "ES2013a",
+  "qa_pairs": [
+    {
+      "id": "q1",
+      "question": "What was the purpose of the meeting?",
+      "gold_answer": "It was the kickoff meeting for a new group creating a new remote control for Real Reaction."
+    },
+    {
+      "id": "q2",
+      "question": "What three qualities did the new remote control need to have?",
+      "gold_answer": "It needed to be original, trendy, and user-friendly."
+    },
+    {
+      "id": "q3",
+      "question": "Who was associated with user friendliness in the project roles?",
+      "gold_answer": "Steph was associated with user friendliness."
+    },
+    {
+      "id": "q4",
+      "question": "What financial target did the group discuss for the remote?",
+      "gold_answer": "The remote should sell for 25 euros, with a profit aim of 50 million euros."
+    },
+    {
+      "id": "q5",
+      "question": "What production cost limit was given per unit?",
+      "gold_answer": "Production should cost only 12.5 euros per item."
+    },
+    {
+      "id": "q6",
+      "question": "How many remotes did the group estimate they would need to sell to reach the profit target?",
+      "gold_answer": "They estimated they would need to sell about four million remotes."
+    },
+    {
+      "id": "q7",
+      "question": "Did the group decide whether the remote was only for television?",
+      "gold_answer": "No. The group raised the question, but did not decide whether the remote was only for television."
+    },
+    {
+      "id": "q8",
+      "question": "What design direction did Kate suggest regarding buttons?",
+      "gold_answer": "Kate suggested avoiding lots of superfluous functions and unnecessary buttons."
+    },
+    {
+      "id": "q9",
+      "question": "What menu-based idea was suggested for simplifying controls?",
+      "gold_answer": "They suggested simplifying controls with menu-based choices, similar to an iPod interface."
+    },
+    {
+      "id": "q10",
+      "question": "What did the project manager decide about ending the meeting and next work?",
+      "gold_answer": "They decided not to prolong the meeting and to move into individual instructions/work."
+    }
+  ]
+}

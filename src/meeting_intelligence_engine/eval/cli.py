@@ -10,6 +10,7 @@ from meeting_intelligence_engine.eval.ami import (
     average_filler_light_wer,
     average_wer,
     evaluate_ami_meeting,
+    save_ami_transcript_artifacts,
     select_ami_meetings,
     write_eval_csv,
     write_eval_json_with_failures,
@@ -27,6 +28,16 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--work-dir", type=Path, default=settings.data_dir / "eval")
     parser.add_argument("--vad", action="store_true")
     parser.add_argument("--stop-on-error", action="store_true")
+    parser.add_argument(
+        "--save-transcripts",
+        action="store_true",
+        help=(
+            "After evaluating each meeting run the full transcription pipeline "
+            "(ASR + diarization + speaker labels) and save transcript artefacts "
+            "(json, md, txt, srt) to "
+            "{data_dir}/meetings/{meeting_id}/transcript/."
+        ),
+    )
     return parser
 
 
@@ -64,6 +75,19 @@ def main(argv: list[str] | None = None) -> int:
                     f"wer={result.wer:.4f} filler_light_wer={result.filler_light_wer:.4f} cer={result.cer:.4f}",
                     flush=True,
                 )
+                if args.save_transcripts:
+                    try:
+                        save_ami_transcript_artifacts(
+                            meeting_id=meeting_id,
+                            work_dir=args.work_dir,
+                            settings=settings,
+                        )
+                    except Exception as exc:
+                        print(
+                            f"[{index}/{total}] {meeting_id} transcript save failed: {exc}",
+                            file=sys.stderr,
+                            flush=True,
+                        )
             except Exception as exc:
                 failure = EvalFailure(meeting_id=meeting_id, audio_path=str(audio_path), error=str(exc))
                 failures.append(failure)

@@ -1,0 +1,55 @@
+{
+  "meeting_id": "ES2016b",
+  "qa_pairs": [
+    {
+      "id": "q1",
+      "question": "Who was assigned to keep the meeting notes and prepare the final presentation?",
+      "gold_answer": "The project lead said they would lead the meetings, keep the notes, and prepare the final presentation."
+    },
+    {
+      "id": "q2",
+      "question": "What did the team decide in the previous meeting about the basic form factor of the remote?",
+      "gold_answer": "They had decided it should probably be one-handed."
+    },
+    {
+      "id": "q3",
+      "question": "What market finding supported focusing on a more attractive remote design?",
+      "gold_answer": "75% found their remotes ugly, and 80% would pay more for a fancy-looking remote."
+    },
+    {
+      "id": "q4",
+      "question": "Which remote-control functions did the marketing report say were practically never used?",
+      "gold_answer": "Audio settings, screen settings, and channel settings were practically never used."
+    },
+    {
+      "id": "q5",
+      "question": "Who argued that a fully universal remote would be difficult and might add buttons?",
+      "gold_answer": "Ryan argued that a universal remote would be difficult, possibly over budget, and would add buttons."
+    },
+    {
+      "id": "q6",
+      "question": "What were the new constraints received from the company for the remote?",
+      "gold_answer": "It should be only for television, have no teletext, and use the corporate color/slogan: gray and yellow, with “we put the fashion in electronics.”"
+    },
+    {
+      "id": "q7",
+      "question": "Did the team clearly approve speech recognition for the final remote concept?",
+      "gold_answer": "No. The team leaned against speech recognition and suggested dropping it."
+    },
+    {
+      "id": "q8",
+      "question": "What locator idea did Ryan propose?",
+      "gold_answer": "Ryan proposed a holder or holster with a button that would make the remote beep so it could be found."
+    },
+    {
+      "id": "q9",
+      "question": "What design work was Ryan asked to do before the next meeting?",
+      "gold_answer": "Ryan was asked to work on how both explored concepts would work with the user."
+    },
+    {
+      "id": "q10",
+      "question": "Near the end, which two concepts did the group plan to explore next?",
+      "gold_answer": "They planned to explore a rounded hand-fitting remote and the possibility of a two-piece design, including a quick-zapping part."
+    }
+  ]
+}
