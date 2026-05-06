@@ -102,35 +102,37 @@ upload
 -> query across the meeting store
 ```
 
-```mermaid
-flowchart LR
-    U[User / Team] --> UI[FastAPI UI + API]
-    UI --> PG[(PostgreSQL)]
-    UI --> RQ[(Redis / Celery Broker)]
-    UI --> Q[(Qdrant)]
+```text
+User / Team
+  -> FastAPI UI + API
+  -> PostgreSQL (meetings, transcripts, analytics, job state)
+  -> Redis / Celery (background jobs)
+  -> Qdrant (retrieval index)
 
-    UI --> UP[Upload Meeting Audio]
-    UP --> W1[Transcription Worker]
-    W1 --> N1[Normalize Audio]
-    N1 --> A1[Groq Whisper ASR]
-    A1 --> D1[Pyannote Diarization]
-    D1 --> AL[Alignment + Segment Repair]
-    AL --> SL[Speaker Label Resolution]
-    SL --> T[(Transcript Artifacts)]
-    SL --> PG
+Upload audio
+  -> Transcription worker
+  -> Normalize audio
+  -> Groq Whisper ASR
+  -> Pyannote diarization
+  -> Alignment + segment repair
+  -> Speaker label resolution
+  -> Transcript artifacts (.json / .txt / .srt / .md)
+  -> PostgreSQL
 
-    T --> W2[Analytics Worker]
-    W2 --> AX[Structured Extraction]
-    AX --> PG
+Transcript artifacts
+  -> Analytics worker
+  -> Structured extraction
+  -> PostgreSQL
 
-    T --> W3[Indexing Worker]
-    W3 --> E1[Ollama Embeddings]
-    E1 --> Q
+Transcript markdown
+  -> Indexing worker
+  -> Ollama embeddings
+  -> Qdrant
 
-    UI --> CQ[Cross-meeting Query]
-    CQ --> Q
-    CQ --> AA[Answer Generation]
-    AA --> U
+Query
+  -> Retrieve transcript chunks from Qdrant
+  -> Generate grounded answer
+  -> Return answer + sources
 ```
 
 System components:
