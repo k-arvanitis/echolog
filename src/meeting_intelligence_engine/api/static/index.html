@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Meeting Intelligence Engine</title>
+    <link rel="stylesheet" href="/static/app.css" />
+  </head>
+  <body>
+    <div class="shell">
+      <header class="topbar">
+        <div>
+          <h1>Meeting Intelligence Engine</h1>
+          <p>Upload audio, track processing, review transcripts, analytics, and transcript RAG.</p>
+        </div>
+        <div class="topbar-actions">
+          <button id="refreshButton" class="button secondary" type="button">Refresh</button>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel upload-panel">
+          <div class="panel-head">
+            <h2>Upload</h2>
+            <span id="uploadStatus" class="muted">Idle</span>
+          </div>
+          <form id="uploadForm" class="upload-form">
+            <label>
+              <span>Title</span>
+              <input id="titleInput" name="title" type="text" placeholder="Weekly product sync" />
+            </label>
+            <label>
+              <span>Audio File</span>
+              <input id="fileInput" name="file" type="file" accept=".wav,.mp3,.mp4,.m4a,audio/*,video/mp4" required />
+            </label>
+            <button class="button primary" type="submit">Upload Meeting</button>
+          </form>
+        </section>
+
+        <section class="grid">
+          <aside class="panel meeting-list-panel">
+            <div class="panel-head">
+              <h2>Meetings</h2>
+              <span id="meetingCount" class="muted">0</span>
+            </div>
+            <div id="meetingList" class="meeting-list"></div>
+          </aside>
+
+          <section class="panel detail-panel">
+            <div class="panel-head">
+              <div>
+                <h2 id="meetingTitle">Select a meeting</h2>
+                <p id="meetingMeta" class="muted">Nothing selected.</p>
+              </div>
+              <div class="detail-actions">
+                <button id="deleteButton" class="button danger" type="button" disabled>Delete</button>
+              </div>
+            </div>
+
+            <div id="detailEmpty" class="empty-state">Choose a meeting to inspect its transcript, analytics, and search results.</div>
+
+            <div id="detailContent" class="detail-content hidden">
+              <section class="status-strip">
+                <div>
+                  <span class="label">Status</span>
+                  <strong id="statusValue">-</strong>
+                </div>
+                <div>
+                  <span class="label">Stage</span>
+                  <strong id="stageValue">-</strong>
+                </div>
+                <div>
+                  <span class="label">Progress</span>
+                  <strong id="progressValue">0%</strong>
+                </div>
+                <div>
+                  <span class="label">Duration</span>
+                  <strong id="durationValue">-</strong>
+                </div>
+              </section>
+
+              <div class="progress-track">
+                <div id="progressBar" class="progress-bar"></div>
+              </div>
+
+              <div class="tab-row" role="tablist">
+                <button class="tab-button active" type="button" data-tab="transcript">Transcript</button>
+                <button class="tab-button" type="button" data-tab="analytics">Analytics</button>
+                <button class="tab-button" type="button" data-tab="knowledge">Knowledge Query</button>
+              </div>
+
+              <section class="tab-panel active" data-panel="transcript">
+                <div class="artifact-links">
+                  <a id="artifactTxt" href="#" target="_blank" rel="noreferrer">TXT</a>
+                  <a id="artifactSrt" href="#" target="_blank" rel="noreferrer">SRT</a>
+                  <a id="artifactJson" href="#" target="_blank" rel="noreferrer">JSON</a>
+                  <a id="artifactMd" href="#" target="_blank" rel="noreferrer">MD</a>
+                </div>
+                <pre id="transcriptText" class="transcript-view">Transcript not loaded.</pre>
+              </section>
+
+              <section class="tab-panel" data-panel="analytics">
+                <div class="analytics-grid">
+                  <section>
+                    <div class="subhead">
+                      <h3>Action Items</h3>
+                      <span id="actionCount" class="muted">0</span>
+                    </div>
+                    <div id="actionItems" class="stack-list"></div>
+                  </section>
+                  <section>
+                    <div class="subhead">
+                      <h3>Decisions</h3>
+                      <span id="decisionCount" class="muted">0</span>
+                    </div>
+                    <div id="decisions" class="stack-list"></div>
+                  </section>
+                  <section>
+                    <div class="subhead">
+                      <h3>Topics</h3>
+                      <span id="topicCount" class="muted">0</span>
+                    </div>
+                    <div id="topics" class="stack-list"></div>
+                  </section>
+                </div>
+              </section>
+
+              <section class="tab-panel" data-panel="knowledge">
+                <form id="queryForm" class="query-form">
+                  <label>
+                    <span>Question</span>
+                    <textarea id="queryInput" rows="3" placeholder="What did they decide about performance?"></textarea>
+                  </label>
+                  <div class="query-controls">
+                    <label class="checkbox">
+                      <input id="scopeMeetingOnly" type="checkbox" checked />
+                      <span>Only selected meeting</span>
+                    </label>
+                    <button class="button primary" type="submit">Run Query</button>
+                  </div>
+                </form>
+                <div id="queryAnswer" class="answer-box">No query yet.</div>
+                <div id="querySources" class="sources"></div>
+              </section>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+
+    <script src="/static/app.js" defer></script>
+  </body>
+</html>

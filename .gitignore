@@ -1,0 +1,24 @@
+# Environment and local config
+.env
+.env.local
+.venv/
+
+# Python caches
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+
+# Editor / local runtime
+.DS_Store
+
+# Generated app artifacts
+data/
+outputs/
+
+# Evaluation artifacts and downloaded datasets
+eval/data/
+eval/results/
+
+# Local sample media
+samples/

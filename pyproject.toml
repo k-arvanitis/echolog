@@ -1,0 +1,40 @@
+[project]
+name = "meeting-intelligence-engine"
+version = "0.1.0"
+description = "Phase 1 meeting intelligence engine: upload, ASR, diarization, alignment, transcript API"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "celery>=5.5.0",
+    "fastapi>=0.115.0",
+    "fastembed>=0.7.4",
+    "groq>=0.31.0",
+    "ollama>=0.6.1",
+    "psycopg[binary]>=3.2.0",
+    "pyannote.audio>=3.3.0,<4.0.0",
+    "pydantic-settings>=2.8.0",
+    "qdrant-client>=1.17.1",
+    "python-multipart>=0.0.20",
+    "redis>=5.2.0",
+    "sqlalchemy>=2.0.0",
+    "torch==2.6.0",
+    "torchaudio==2.6.0",
+    "uvicorn[standard]>=0.34.0",
+]
+
+[project.optional-dependencies]
+dev = ["httpx>=0.28.0", "pytest>=8.0.0", "ruff>=0.11.0"]
+
+[project.scripts]
+meeting-transcribe = "meeting_intelligence_engine.cli:main"
+meeting-api = "meeting_intelligence_engine.api.main:main"
+meeting-worker = "meeting_intelligence_engine.workers.worker:main"
+mie-ingest-md = "meeting_intelligence_engine.rag.ingest:main"
+mie-eval-ami = "meeting_intelligence_engine.eval.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
