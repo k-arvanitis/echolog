@@ -27,7 +27,11 @@ class Settings(BaseSettings):
     max_upload_mb: int = Field(default=500, alias="MIE_MAX_UPLOAD_MB")
     max_duration_seconds: int = Field(default=14_400, alias="MIE_MAX_DURATION_SECONDS")
     api_host: str = Field(default="0.0.0.0", alias="MIE_API_HOST")
-    api_port: int = Field(default=8000, alias="MIE_API_PORT")
+    api_port: int = Field(default=8001, alias="MIE_API_PORT")
+    cors_allow_origins: list[str] = Field(
+        default=["http://localhost:3000", "http://127.0.0.1:3000"],
+        alias="MIE_CORS_ALLOW_ORIGINS",
+    )
     database_url: str = Field(default="postgresql+psycopg://mie:mie@localhost:5432/mie", alias="DATABASE_URL")
     redis_url: str = Field(default="redis://localhost:6379/0", alias="REDIS_URL")
     celery_task_always_eager: bool = Field(default=False, alias="CELERY_TASK_ALWAYS_EAGER")
