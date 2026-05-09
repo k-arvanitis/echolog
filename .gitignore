@@ -11,6 +11,8 @@ __pycache__/
 
 # Editor / local runtime
 .DS_Store
+LOCAL_ARCHITECTURE_GUIDE.md
+docs/
 
 # Generated app artifacts
 data/
