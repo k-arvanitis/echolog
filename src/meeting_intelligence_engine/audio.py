@@ -2,9 +2,8 @@ from __future__ import annotations
 
 import shutil
 import subprocess
-from pathlib import Path
 from dataclasses import dataclass
-
+from pathlib import Path
 
 SUPPORTED_SUFFIXES = {".wav", ".mp3", ".mp4", ".m4a"}
 

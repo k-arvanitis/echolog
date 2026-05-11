@@ -4,7 +4,6 @@ from celery import Celery
 
 from meeting_intelligence_engine.config import settings
 
-
 broker_url = "memory://" if settings.celery_task_always_eager else settings.redis_url
 result_backend = "cache+memory://" if settings.celery_task_always_eager else settings.redis_url
 

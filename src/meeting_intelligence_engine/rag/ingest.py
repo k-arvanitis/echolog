@@ -3,7 +3,15 @@ from __future__ import annotations
 import argparse
 from pathlib import Path
 
-from qdrant_client.models import Distance, FieldCondition, Filter, MatchValue, PointStruct, SparseVectorParams, VectorParams
+from qdrant_client.models import (
+    Distance,
+    FieldCondition,
+    Filter,
+    MatchValue,
+    PointStruct,
+    SparseVectorParams,
+    VectorParams,
+)
 
 from meeting_intelligence_engine.config import settings
 from meeting_intelligence_engine.rag.chunking import chunk_markdown_files
@@ -33,9 +41,7 @@ def delete_by_meeting_id(meeting_id: str) -> None:
     ensure_collection()
     get_qdrant_client().delete(
         collection_name=settings.qdrant_collection,
-        points_selector=Filter(
-            must=[FieldCondition(key="meeting_id", match=MatchValue(value=meeting_id))]
-        ),
+        points_selector=Filter(must=[FieldCondition(key="meeting_id", match=MatchValue(value=meeting_id))]),
     )
 
 

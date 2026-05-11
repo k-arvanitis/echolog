@@ -51,7 +51,9 @@ def write_srt(path: Path, transcript: TranscriptResult) -> None:
 def write_markdown(path: Path, transcript: TranscriptResult, meeting_title: str | None = None) -> None:
     lines = [f"# {meeting_title or f'Meeting {transcript.meeting_id}'}", ""]
     for segment in transcript.segments:
-        lines.append(f"[{format_ts(segment.start_time)} --> {format_ts(segment.end_time)}] {display_speaker(segment)}: {segment.text}")
+        lines.append(
+            f"[{format_ts(segment.start_time)} --> {format_ts(segment.end_time)}] {display_speaker(segment)}: {segment.text}"
+        )
         lines.append("")
     path.write_text("\n".join(lines).strip() + "\n", encoding="utf-8")
 

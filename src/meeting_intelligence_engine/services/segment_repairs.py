@@ -4,7 +4,6 @@ import re
 
 from meeting_intelligence_engine.core.schemas import TranscriptResult, TranscriptSegment
 
-
 INTRO_LEAD_RE = re.compile(r"\b(?:i am|i'm|my name is|this is)\b", re.IGNORECASE)
 INTRO_FRAGMENT_END_RE = re.compile(
     r"(?:\bwith\s+a\b|\bwith\s+an\b|\bwith\s+the\b|\band\b|\bfrom\b|\bat\b|\bfor\b)\s*[.]?$",
@@ -69,13 +68,16 @@ def _split_leading_sentence(text: str) -> tuple[str, str] | None:
     return prefix, rest
 
 
-def _move_leading_prefix(left: TranscriptSegment, right: TranscriptSegment, prefix: str, rest: str) -> tuple[TranscriptSegment, TranscriptSegment | None]:
+def _move_leading_prefix(
+    left: TranscriptSegment, right: TranscriptSegment, prefix: str, rest: str
+) -> tuple[TranscriptSegment, TranscriptSegment | None]:
     merged_left = TranscriptSegment(
         id=left.id,
         speaker_id=left.speaker_id,
         speaker_name=left.speaker_name,
         start_time=left.start_time,
-        end_time=right.start_time + min(right.end_time - right.start_time, max(0.2, (right.end_time - right.start_time) * 0.2)),
+        end_time=right.start_time
+        + min(right.end_time - right.start_time, max(0.2, (right.end_time - right.start_time) * 0.2)),
         text=f"{left.text.rstrip()} {prefix}".strip(),
         words=[*left.words],
     )
