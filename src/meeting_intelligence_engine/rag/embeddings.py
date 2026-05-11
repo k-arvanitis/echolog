@@ -13,7 +13,7 @@ _sparse_encoder: SparseTextEmbedding | None = None
 def get_qdrant_client() -> QdrantClient:
     kwargs = {"url": settings.qdrant_url}
     if settings.qdrant_api_key:
-        kwargs["api_key"] = settings.qdrant_api_key
+        kwargs["api_key"] = settings.secret("qdrant_api_key")
     return QdrantClient(**kwargs)
 
 

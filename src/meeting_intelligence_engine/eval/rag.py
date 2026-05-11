@@ -147,7 +147,7 @@ def _answer_from_eval_sources(question: str, sources: list[dict], config: Settin
     for index, source in enumerate(sources, start=1):
         context_blocks.append(f"[Source {index}]\n{str(source.get('content', '')).strip()}")
 
-    client = Groq(api_key=config.groq_api_key)
+    client = Groq(api_key=config.secret("groq_api_key"))
     response = client.chat.completions.create(
         model=config.rag_model_name,
         temperature=0,
@@ -160,7 +160,7 @@ def _answer_from_eval_sources(question: str, sources: list[dict], config: Settin
                     "For yes/no questions, start with Yes or No. "
                     "For who/what/when questions, answer in one short sentence if possible. "
                     "If the answer is not supported, say exactly: "
-                    "\"I don't have information about that in the meeting records.\" "
+                    '"I don\'t have information about that in the meeting records." '
                     "Include inline citations like [Source 1]."
                 ),
             },
@@ -170,7 +170,9 @@ def _answer_from_eval_sources(question: str, sources: list[dict], config: Settin
             },
         ],
     )
-    return (response.choices[0].message.content or "").strip() or "I don't have information about that in the meeting records."
+    return (
+        response.choices[0].message.content or ""
+    ).strip() or "I don't have information about that in the meeting records."
 
 
 def _run_rag_query(
@@ -188,7 +190,9 @@ def _run_rag_query(
     result = client.query_points(
         collection_name=collection_name,
         prefetch=[
-            Prefetch(query=dense_embed(f"query: {question}"), using="dense", limit=candidate_limit, filter=query_filter),
+            Prefetch(
+                query=dense_embed(f"query: {question}"), using="dense", limit=candidate_limit, filter=query_filter
+            ),
             Prefetch(query=sparse_embed(question), using="sparse", limit=candidate_limit, filter=query_filter),
         ],
         query=FusionQuery(fusion=Fusion.RRF),
@@ -219,21 +223,19 @@ def _run_rag_query(
 
 def _build_ragas_metrics(config: Settings) -> dict[str, Any]:
     try:
-        from langchain_openai import ChatOpenAI
         from langchain_ollama import OllamaEmbeddings
+        from langchain_openai import ChatOpenAI
         from ragas.embeddings import LangchainEmbeddingsWrapper
         from ragas.llms import LangchainLLMWrapper
         from ragas.metrics import AnswerRelevancy, ContextPrecision, ContextRecall, Faithfulness
     except ImportError as exc:
-        raise RuntimeError(
-            "RAG evaluation requires optional dependencies. Run `uv sync --extra eval`."
-        ) from exc
+        raise RuntimeError("RAG evaluation requires optional dependencies. Run `uv sync --extra eval`.") from exc
 
     if not config.openai_api_key:
         raise RuntimeError("RAG evaluation judge requires OPENAI_API_KEY.")
 
     ragas_llm = LangchainLLMWrapper(
-        ChatOpenAI(model=config.rag_eval_judge_model, temperature=0, api_key=config.openai_api_key)
+        ChatOpenAI(model=config.rag_eval_judge_model, temperature=0, api_key=config.secret("openai_api_key"))
     )
     ragas_embeddings = LangchainEmbeddingsWrapper(OllamaEmbeddings(model=config.dense_model))
     return {
@@ -244,7 +246,9 @@ def _build_ragas_metrics(config: Settings) -> dict[str, Any]:
     }
 
 
-def _score_ragas_sample(question: str, gold_answer: str, predicted_answer: str, contexts: list[str], metrics: dict[str, Any]) -> dict[str, float | None]:
+def _score_ragas_sample(
+    question: str, gold_answer: str, predicted_answer: str, contexts: list[str], metrics: dict[str, Any]
+) -> dict[str, float | None]:
     if not contexts:
         return {
             "faithfulness": None,
@@ -306,9 +310,7 @@ def evaluate_rag_qa_sets(
                 config=config,
             )
             contexts = [
-                str(source.get("content", "")).strip()
-                for source in result.get("sources", [])
-                if source.get("content")
+                str(source.get("content", "")).strip() for source in result.get("sources", []) if source.get("content")
             ]
             scores = _score_ragas_sample(
                 qa.question,

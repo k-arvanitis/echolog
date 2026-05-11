@@ -12,14 +12,14 @@ from meeting_intelligence_engine.implementations.local_pipeline import (
 def build_pipeline(settings: Settings) -> LocalTranscriptionPipeline:
     return LocalTranscriptionPipeline(
         asr=GroqWhisperASR(
-            api_key=settings.groq_api_key,
+            api_key=settings.secret("groq_api_key"),
             model_name=settings.asr_model_name,
             language=settings.language,
             chunk_seconds=settings.asr_chunk_seconds,
         ),
         diarization=PyannoteDiarization(
             model_name=settings.diarization_model_name,
-            hf_token=settings.hf_token,
+            hf_token=settings.secret("hf_token"),
         ),
         alignment=TimeOverlapAlignment(),
         device=settings.device,

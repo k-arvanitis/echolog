@@ -11,14 +11,19 @@ from pathlib import Path
 from uuid import UUID
 from zipfile import ZipFile
 
-from meeting_intelligence_engine.audio import extract_audio_range, normalize_audio, probe_duration, require_ffmpeg, validate_audio
+from meeting_intelligence_engine.audio import (
+    extract_audio_range,
+    normalize_audio,
+    probe_duration,
+    require_ffmpeg,
+    validate_audio,
+)
 from meeting_intelligence_engine.config import Settings
 from meeting_intelligence_engine.exporters import write_transcript_outputs
 from meeting_intelligence_engine.implementations.local_pipeline import GroqWhisperASR, resolve_device
 from meeting_intelligence_engine.services.pipeline_factory import build_pipeline
 from meeting_intelligence_engine.services.segment_repairs import repair_intro_fragments
 from meeting_intelligence_engine.services.speaker_labels import apply_speaker_labels, infer_speaker_labels
-
 
 FILLER_TOKENS = {
     "uh",
@@ -132,7 +137,9 @@ def normalize_for_filler_light_wer(text: str) -> str:
     return " ".join(compacted)
 
 
-def _levenshtein_operations(reference: list[str], hypothesis: list[str]) -> tuple[EditCounts, list[tuple[str, str | None, str | None]]]:
+def _levenshtein_operations(
+    reference: list[str], hypothesis: list[str]
+) -> tuple[EditCounts, list[tuple[str, str | None, str | None]]]:
     rows = len(reference) + 1
     cols = len(hypothesis) + 1
     dp = [[0] * cols for _ in range(rows)]
@@ -239,7 +246,9 @@ def _iter_word_files_from_zip(zip_path: Path, meeting_id: str) -> list[tuple[str
         if exact_name in archive.namelist():
             return [(exact_name, archive.read(exact_name))]
         matches = sorted(
-            name for name in archive.namelist() if name.startswith(f"words/{meeting_id}.") and name.endswith(".words.xml")
+            name
+            for name in archive.namelist()
+            if name.startswith(f"words/{meeting_id}.") and name.endswith(".words.xml")
         )
         return [(name, archive.read(name)) for name in matches]
 
@@ -359,7 +368,7 @@ def transcribe_audio_for_eval(
     normalized_path = work_dir / f"{audio_path.stem}.eval.wav"
     normalize_audio(audio_path, normalized_path)
     asr = GroqWhisperASR(
-        api_key=settings.groq_api_key,
+        api_key=settings.secret("groq_api_key"),
         model_name=settings.asr_model_name,
         language=settings.language,
         chunk_seconds=settings.asr_chunk_seconds,
@@ -370,7 +379,11 @@ def transcribe_audio_for_eval(
         return _transcribe_chunks(normalized_path, asr, chunks, work_dir), chunks, "silencedetect_vad"
     segments = asr.transcribe(normalized_path)
     duration = probe_duration(normalized_path)
-    return " ".join(segment.text.strip() for segment in segments if segment.text.strip()), [SpeechChunk(0.0, duration)], "fixed_chunking"
+    return (
+        " ".join(segment.text.strip() for segment in segments if segment.text.strip()),
+        [SpeechChunk(0.0, duration)],
+        "fixed_chunking",
+    )
 
 
 def _score_normalization(reference_text: str, predicted_text: str, normalizer) -> NormalizedMetrics:
@@ -429,7 +442,9 @@ def evaluate_ami_meeting(
     use_vad: bool = False,
 ) -> AMIEvaluationResult:
     reference_text_raw, transcript_sources = parse_ami_meeting_reference(transcript_source, meeting_id)
-    predicted_text_raw, chunks, chunking_strategy = transcribe_audio_for_eval(audio_path, settings, work_dir / meeting_id, use_vad=use_vad)
+    predicted_text_raw, chunks, chunking_strategy = transcribe_audio_for_eval(
+        audio_path, settings, work_dir / meeting_id, use_vad=use_vad
+    )
     raw_metrics = _score_normalization(reference_text_raw, predicted_text_raw, normalize_for_wer)
     filler_light_metrics = _score_normalization(reference_text_raw, predicted_text_raw, normalize_for_filler_light_wer)
     buckets = _analyze_error_buckets(raw_metrics.reference_text, raw_metrics.predicted_text)
@@ -475,20 +490,19 @@ def save_ami_transcript_artifacts(
     """
     normalised_path = work_dir / meeting_id / f"{meeting_id}.Mix-Headset.eval.wav"
     if not normalised_path.exists():
-        raise FileNotFoundError(
-            f"Normalised audio not found at {normalised_path}. "
-            "Run evaluate_ami_meeting first."
-        )
+        raise FileNotFoundError(f"Normalised audio not found at {normalised_path}. Run evaluate_ami_meeting first.")
     pipeline = build_pipeline(settings)
     transcript = pipeline.process(normalised_path, meeting_id=UUID(int=0, version=4))  # dummy UUID – overridden below
     # Give the transcript the AMI meeting_id as a stable UUID-like identifier by
     # encoding the ASCII meeting_id string into the UUID namespace.
     import uuid as _uuid
+
     stable_id = _uuid.uuid5(_uuid.NAMESPACE_DNS, meeting_id)
     # Pydantic model is frozen-ish; rebuild via dict mutation.
     data = transcript.model_dump()
     data["meeting_id"] = stable_id
     from meeting_intelligence_engine.core.schemas import TranscriptResult
+
     transcript = TranscriptResult.model_validate(data)
     repair_intro_fragments(transcript)
     apply_speaker_labels(transcript, infer_speaker_labels(transcript, settings))
