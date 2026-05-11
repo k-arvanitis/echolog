@@ -10,6 +10,7 @@ from groq import Groq
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from meeting_intelligence_engine import prompts
 from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.core.schemas import TranscriptResult
 from meeting_intelligence_engine.models import Meeting, SpeakerLabel
@@ -181,20 +182,18 @@ def _fallback_candidates_with_llm(
         return {}
 
     client = Groq(api_key=config.secret("groq_api_key"))
+    logger.info(
+        "speaker-label LLM call model=%s prompt_version=%s unresolved=%d",
+        config.analytics_model_name,
+        prompts.PROMPT_VERSION,
+        len(unresolved_speaker_ids),
+    )
     response = client.chat.completions.create(
         model=config.analytics_model_name,
         temperature=0.0,
         response_format={"type": "json_object"},
         messages=[
-            {
-                "role": "system",
-                "content": (
-                    "You resolve diarized speaker IDs to real names only when the transcript explicitly supports it. "
-                    "Return JSON with one key: speaker_labels. Its value must be a list of objects with keys "
-                    "speaker_id, speaker_name, confidence, evidence_text. Only include a speaker if the evidence is explicit. "
-                    "If uncertain, omit it. Do not guess."
-                ),
-            },
+            {"role": "system", "content": prompts.SPEAKER_LABEL_SYSTEM},
             {
                 "role": "user",
                 "content": (

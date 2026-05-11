@@ -178,6 +178,8 @@ Run on a **50-question, 5-meeting** QA fixture in `eval/rag_qa/`, judged by `gpt
 
 The headline number is **faithfulness** — the system answers from retrieved evidence and refuses when it can't, instead of confidently inventing decisions or owners. The retrieval config is intentionally tuned toward cleaner evidence (better precision, slightly worse recall) because for a meeting-memory product, narrow correct retrieval beats noisy broad retrieval.
 
+All prompts live in `prompts.py` behind a `PROMPT_VERSION`; the eval output records it (and so do the runtime logs), so a quality number is always tied to the prompt that produced it. The committed results above are `PROMPT_VERSION = 2026-05-11`.
+
 Run it:
 
 ```bash
@@ -293,7 +295,7 @@ recall-mie/
 │   ├── eval/                  # AMI WER + RAG eval harnesses
 │   ├── core/                  # Pydantic schemas, abstract interfaces
 │   ├── implementations/       # Concrete ASR + diarization adapters
-│   ├── audio.py / db.py / models.py / config.py / cli.py / exporters.py / logging_config.py
+│   ├── audio.py / db.py / models.py / config.py / cli.py / exporters.py / logging_config.py / prompts.py
 │   └── __init__.py
 ├── frontend/                  # Next.js 14 app router
 │   ├── app/                   # layout.tsx, page.tsx, globals.css

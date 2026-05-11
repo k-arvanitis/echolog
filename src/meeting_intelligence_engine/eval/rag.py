@@ -9,6 +9,7 @@ from typing import Any
 
 from groq import Groq
 
+from meeting_intelligence_engine import prompts
 from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.rag.chunking import chunk_markdown_files
 from meeting_intelligence_engine.rag.embeddings import dense_embed, get_qdrant_client, sparse_embed
@@ -139,7 +140,7 @@ def _rerank_sources(question: str, sources: list[dict], keep: int = 10) -> list[
 
 def _answer_from_eval_sources(question: str, sources: list[dict], config: Settings) -> str:
     if not sources:
-        return "I don't have information about that in the meeting records."
+        return prompts.NO_INFO_MESSAGE
     if not config.groq_api_key:
         return "\n\n".join(source["content"] for source in sources if source.get("content"))
 
@@ -152,27 +153,14 @@ def _answer_from_eval_sources(question: str, sources: list[dict], config: Settin
         model=config.rag_model_name,
         temperature=0,
         messages=[
-            {
-                "role": "system",
-                "content": (
-                    "Answer only from the provided meeting transcript context. "
-                    "Give the most direct answer possible. "
-                    "For yes/no questions, start with Yes or No. "
-                    "For who/what/when questions, answer in one short sentence if possible. "
-                    "If the answer is not supported, say exactly: "
-                    '"I don\'t have information about that in the meeting records." '
-                    "Include inline citations like [Source 1]."
-                ),
-            },
+            {"role": "system", "content": prompts.RAG_EVAL_ANSWER_SYSTEM},
             {
                 "role": "user",
                 "content": f"Question:\n{question}\n\nContext:\n\n" + "\n\n".join(context_blocks),
             },
         ],
     )
-    return (
-        response.choices[0].message.content or ""
-    ).strip() or "I don't have information about that in the meeting records."
+    return (response.choices[0].message.content or "").strip() or prompts.NO_INFO_MESSAGE
 
 
 def _run_rag_query(
@@ -355,6 +343,7 @@ def build_rag_eval_summary(rows: list[RAGEvaluationRow]) -> dict[str, Any]:
         return statistics.fmean(usable) if usable else None
 
     return {
+        "prompt_version": prompts.PROMPT_VERSION,
         "question_count": len(rows),
         "meeting_count": len({row.meeting_id for row in rows}),
         "faithfulness": avg([row.faithfulness for row in rows]),

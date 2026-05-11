@@ -7,12 +7,11 @@ from uuid import UUID
 from groq import Groq
 from qdrant_client.models import FieldCondition, Filter, Fusion, FusionQuery, MatchAny, MatchValue, Prefetch
 
+from meeting_intelligence_engine import prompts
 from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.rag.embeddings import dense_embed, get_qdrant_client, sparse_embed
 
 logger = logging.getLogger(__name__)
-
-NO_INFO_MESSAGE = "I don't have information about that in the meeting records."
 
 
 def build_meeting_filter(meeting_ids: list[str] | None = None) -> Filter | None:
@@ -65,7 +64,7 @@ def retrieve_markdown_sources(query: str, top_k: int = 5, meeting_ids: list[str]
 def answer_from_sources(query: str, sources: list[dict], config: Settings = settings) -> str:
     if not sources:
         logger.info("no retrieved sources for query=%r", query)
-        return NO_INFO_MESSAGE
+        return prompts.NO_INFO_MESSAGE
     if not config.groq_api_key:
         logger.warning("GROQ_API_KEY not set; returning raw source content for query=%r", query)
         return "\n\n".join(source["content"] for source in sources if source.get("content"))
@@ -88,19 +87,17 @@ def answer_from_sources(query: str, sources: list[dict], config: Settings = sett
 
     try:
         client = Groq(api_key=config.secret("groq_api_key"))
+        logger.info(
+            "answer query model=%s prompt_version=%s sources=%d",
+            config.rag_model_name,
+            prompts.PROMPT_VERSION,
+            len(sources),
+        )
         response = client.chat.completions.create(
             model=config.rag_model_name,
             temperature=0.1,
             messages=[
-                {
-                    "role": "system",
-                    "content": (
-                        "Answer only from the provided meeting transcript context. "
-                        "If the answer is not supported by the context, say exactly: "
-                        f'"{NO_INFO_MESSAGE}" '
-                        "When you answer, include inline citations like [Source 1]."
-                    ),
-                },
+                {"role": "system", "content": prompts.RAG_ANSWER_SYSTEM},
                 {
                     "role": "user",
                     "content": f"Question:\n{query}\n\nContext:\n\n" + "\n\n".join(context_blocks),
@@ -110,7 +107,7 @@ def answer_from_sources(query: str, sources: list[dict], config: Settings = sett
     except Exception:
         logger.exception("answer generation failed for query=%r; returning raw source content", query)
         return "\n\n".join(source["content"] for source in sources if source.get("content"))
-    return (response.choices[0].message.content or "").strip() or NO_INFO_MESSAGE
+    return (response.choices[0].message.content or "").strip() or prompts.NO_INFO_MESSAGE
 
 
 def query_markdown_knowledge(query: str, top_k: int = 5, meeting_ids: list[str] | None = None) -> dict:

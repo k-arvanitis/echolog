@@ -10,6 +10,7 @@ from pydantic import ValidationError
 from sqlalchemy import delete, select
 from sqlalchemy.orm import Session
 
+from meeting_intelligence_engine import prompts
 from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.core.schemas import AnalyticsResult
 from meeting_intelligence_engine.models import ActionItem, Decision, Topic, TranscriptSegment
@@ -19,36 +20,6 @@ logger = logging.getLogger(__name__)
 
 
 _FLOAT_PATTERN = re.compile(r"-?\d+(?:\.\d+)?")
-JSON_ANALYTICS_TEMPLATE = {
-    "action_items": [
-        {
-            "description": "string",
-            "assignee_inferred": "string or null",
-            "deadline": "string or null",
-            "priority": "low|medium|high",
-            "confidence": 0.0,
-            "timestamp": 0.0,
-        }
-    ],
-    "decisions": [
-        {
-            "decision_text": "string",
-            "context": "string or null",
-            "stakeholders": ["string"],
-            "timestamp": 0.0,
-            "confidence": 0.0,
-        }
-    ],
-    "topics": [
-        {
-            "topic_name": "string",
-            "start_time": 0.0,
-            "end_time": 0.0,
-            "keywords": ["string"],
-            "confidence": 0.0,
-        }
-    ],
-}
 
 
 def transcript_for_analytics(session: Session, meeting_id: UUID) -> str:
@@ -77,6 +48,7 @@ def _groq_client(config: Settings = settings) -> Groq:
 
 def _request_json(messages: list[dict[str, str]], config: Settings = settings) -> dict:
     client = _groq_client(config)
+    logger.info("analytics LLM call model=%s prompt_version=%s", config.analytics_model_name, prompts.PROMPT_VERSION)
     response = client.chat.completions.create(
         model=config.analytics_model_name,
         temperature=0.0,
@@ -96,24 +68,12 @@ def _request_json(messages: list[dict[str, str]], config: Settings = settings) -
 def _extract_topics_only(transcript_text: str, config: Settings = settings) -> list[dict]:
     payload = _request_json(
         [
-            {
-                "role": "system",
-                "content": (
-                    "Extract only meeting topics from the transcript. Return only valid JSON with one key: topics. "
-                    "Each topic must be an object with keys topic_name, start_time, end_time, keywords, confidence. "
-                    "start_time and end_time must be numeric seconds taken from the transcript timestamps, not strings. "
-                    "keywords must be an array of short strings. confidence must be a number from 0 to 1. "
-                    "You must return at least one topic when the meeting clearly contains any discussion topic. "
-                    "Do not return prose. Do not wrap JSON in markdown."
-                ),
-            },
+            {"role": "system", "content": prompts.ANALYTICS_TOPICS_SYSTEM},
             {
                 "role": "user",
                 "content": (
-                    "Transcript:\n"
-                    f"{transcript_text}\n\n"
-                    "Return JSON shaped like:\n"
-                    '{"topics":[{"topic_name":"Parking policy","start_time":120.5,"end_time":240.0,"keywords":["parking","spaces"],"confidence":0.82}]}'
+                    f"Transcript:\n{transcript_text}\n\n"
+                    f"Return JSON shaped like:\n{prompts.ANALYTICS_TOPICS_USER_EXAMPLE}"
                 ),
             },
         ],
@@ -126,26 +86,12 @@ def _extract_topics_only(transcript_text: str, config: Settings = settings) -> l
 def extract_analytics(transcript_text: str, config: Settings = settings) -> AnalyticsResult:
     payload = _request_json(
         [
-            {
-                "role": "system",
-                "content": (
-                    "Extract meeting intelligence from the transcript and return only JSON. "
-                    "The JSON must contain exactly these keys: action_items, decisions, topics. "
-                    "Use arrays for all three keys, even if empty. "
-                    "Timestamps must be numeric seconds copied from the transcript timestamps, not date strings, not values like '24.90s'. "
-                    "stakeholders and keywords must be arrays of strings. "
-                    "priority must be one of low, medium, high. "
-                    "confidence must be a number from 0 to 1. "
-                    "For each decision, include a short context sentence explaining what was agreed and who was involved when that is supported by the transcript. "
-                    "For each decision, populate stakeholders with the participant names or speaker labels involved when present in the transcript. "
-                    "If a field is unknown, use null for scalar fields and [] for list fields. "
-                    "Do not return prose. Do not wrap JSON in markdown."
-                ),
-            },
+            {"role": "system", "content": prompts.ANALYTICS_SYSTEM},
             {
                 "role": "user",
                 "content": (
-                    f"Transcript:\n{transcript_text}\n\nReturn JSON shaped like:\n{json.dumps(JSON_ANALYTICS_TEMPLATE)}"
+                    f"Transcript:\n{transcript_text}\n\n"
+                    f"Return JSON shaped like:\n{json.dumps(prompts.ANALYTICS_JSON_TEMPLATE)}"
                 ),
             },
         ],
