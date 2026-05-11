@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import time
 from pathlib import Path
 from uuid import UUID, uuid4
@@ -9,6 +10,8 @@ from meeting_intelligence_engine.config import Settings
 from meeting_intelligence_engine.core.schemas import ProcessingStage, SpeakerSegment, TranscriptResult
 from meeting_intelligence_engine.implementations.local_pipeline import clean_transcript_segments, max_segment_end
 from meeting_intelligence_engine.services.pipeline_factory import build_pipeline
+
+logger = logging.getLogger(__name__)
 
 
 class ProgressReporter:
@@ -46,6 +49,7 @@ def transcribe_and_diarize_stage(
     try:
         speaker_segments = pipeline.diarization.diarize(audio_path)
     except Exception as exc:
+        logger.warning("diarization failed; falling back to single speaker: %s", exc)
         diarization_warning = str(exc)
         speaker_segments = [SpeakerSegment(speaker_id="SPEAKER_00", start=0.0, end=max_segment_end(asr_segments))]
 

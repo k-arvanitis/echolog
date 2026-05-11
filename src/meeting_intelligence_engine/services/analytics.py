@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from uuid import UUID, uuid4
 
@@ -13,6 +14,8 @@ from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.core.schemas import AnalyticsResult
 from meeting_intelligence_engine.models import ActionItem, Decision, Topic, TranscriptSegment
 from meeting_intelligence_engine.services.meetings import get_meeting, mark_meeting_completed
+
+logger = logging.getLogger(__name__)
 
 
 _FLOAT_PATTERN = re.compile(r"-?\d+(?:\.\d+)?")
@@ -69,7 +72,7 @@ def _transcript_segments(session: Session, meeting_id: UUID) -> list[TranscriptS
 def _groq_client(config: Settings = settings) -> Groq:
     if not config.groq_api_key:
         raise RuntimeError("Missing GROQ_API_KEY")
-    return Groq(api_key=config.groq_api_key)
+    return Groq(api_key=config.secret("groq_api_key"))
 
 
 def _request_json(messages: list[dict[str, str]], config: Settings = settings) -> dict:
@@ -142,10 +145,7 @@ def extract_analytics(transcript_text: str, config: Settings = settings) -> Anal
             {
                 "role": "user",
                 "content": (
-                    "Transcript:\n"
-                    f"{transcript_text}\n\n"
-                    "Return JSON shaped like:\n"
-                    f"{json.dumps(JSON_ANALYTICS_TEMPLATE)}"
+                    f"Transcript:\n{transcript_text}\n\nReturn JSON shaped like:\n{json.dumps(JSON_ANALYTICS_TEMPLATE)}"
                 ),
             },
         ],
@@ -261,7 +261,8 @@ def process_analytics(session: Session, meeting_id: UUID, config: Settings = set
         raise RuntimeError(f"No transcript text available for meeting {meeting_id}")
     try:
         result = extract_analytics(transcript_text, config)
-    except RuntimeError:
+    except RuntimeError as exc:
+        logger.warning("analytics extraction failed for meeting %s; storing empty result: %s", meeting_id, exc)
         result = AnalyticsResult()
     enrich_analytics_from_transcript(session, meeting_id, result)
     save_analytics(session, meeting_id, result)
@@ -274,7 +275,12 @@ def enrich_analytics_from_transcript(session: Session, meeting_id: UUID, result:
         return
     for decision in result.decisions:
         if decision.timestamp is not None:
-            nearby = [segment for segment in segments if segment.start_time <= decision.timestamp + 20 and segment.end_time >= max(0.0, decision.timestamp - 20)]
+            nearby = [
+                segment
+                for segment in segments
+                if segment.start_time <= decision.timestamp + 20
+                and segment.end_time >= max(0.0, decision.timestamp - 20)
+            ]
         else:
             nearby = [segment for segment in segments if decision.decision_text.lower()[:40] in segment.text.lower()]
             if not nearby:

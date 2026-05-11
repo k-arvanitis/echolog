@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import logging
 import shutil
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -14,12 +15,18 @@ from meeting_intelligence_engine.core.schemas import MeetingStatus, ProcessingSt
 from meeting_intelligence_engine.exporters import read_transcript, write_transcript_outputs
 from meeting_intelligence_engine.models import Meeting, TranscriptSegment
 from meeting_intelligence_engine.services.segment_repairs import repair_intro_fragments
-from meeting_intelligence_engine.services.speaker_labels import apply_speaker_labels, infer_speaker_labels, save_speaker_labels
+from meeting_intelligence_engine.services.speaker_labels import (
+    apply_speaker_labels,
+    infer_speaker_labels,
+    save_speaker_labels,
+)
 from meeting_intelligence_engine.services.transcription_stages import (
     ProgressReporter,
     normalize_stage,
     transcribe_and_diarize_stage,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def create_meeting_from_file(
@@ -118,6 +125,7 @@ def process_meeting(session: Session, meeting_id: UUID, config: Settings = setti
         if config.delete_raw_audio_after_processing:
             purge_raw_audio(session, meeting_id)
     except Exception as exc:
+        logger.exception("transcription pipeline failed for meeting %s", meeting_id)
         if mark_failed:
             mark_meeting_failed(session, meeting_id, str(exc))
         raise

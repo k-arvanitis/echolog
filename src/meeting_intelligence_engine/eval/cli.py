@@ -15,6 +15,7 @@ from meeting_intelligence_engine.eval.ami import (
     write_eval_csv,
     write_eval_json_with_failures,
 )
+from meeting_intelligence_engine.logging_config import configure_logging
 
 
 def build_parser() -> argparse.ArgumentParser:
@@ -42,6 +43,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main(argv: list[str] | None = None) -> int:
+    configure_logging()
     args = build_parser().parse_args(argv)
     try:
         selected = select_ami_meetings(

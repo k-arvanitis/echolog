@@ -1,16 +1,30 @@
 from __future__ import annotations
 
-import time
+import logging
 import tempfile
+import time
+from collections import Counter
 from collections.abc import Iterator
 from contextlib import contextmanager
-from collections import Counter
 from pathlib import Path
 from uuid import UUID, uuid4
 
 from meeting_intelligence_engine.audio import split_audio
-from meeting_intelligence_engine.core.interfaces import AlignmentEngine, ASRModel, DiarizationModel, TranscriptionPipeline
-from meeting_intelligence_engine.core.schemas import ASRSegment, SpeakerSegment, TranscriptResult, TranscriptSegment, Word
+from meeting_intelligence_engine.core.interfaces import (
+    AlignmentEngine,
+    ASRModel,
+    DiarizationModel,
+    TranscriptionPipeline,
+)
+from meeting_intelligence_engine.core.schemas import (
+    ASRSegment,
+    SpeakerSegment,
+    TranscriptResult,
+    TranscriptSegment,
+    Word,
+)
+
+logger = logging.getLogger(__name__)
 
 
 class ModelError(RuntimeError):
@@ -179,7 +193,9 @@ class TimeOverlapAlignment(AlignmentEngine):
     def align(self, asr_segments: list[ASRSegment], speaker_segments: list[SpeakerSegment]) -> list[TranscriptSegment]:
         if not speaker_segments:
             return [
-                TranscriptSegment(speaker_id="SPEAKER_00", start_time=s.start, end_time=s.end, text=s.text, words=s.words)
+                TranscriptSegment(
+                    speaker_id="SPEAKER_00", start_time=s.start, end_time=s.end, text=s.text, words=s.words
+                )
                 for s in asr_segments
             ]
 
@@ -233,7 +249,9 @@ class TimeOverlapAlignment(AlignmentEngine):
 
 
 class LocalTranscriptionPipeline(TranscriptionPipeline):
-    def __init__(self, asr: ASRModel, diarization: DiarizationModel, alignment: AlignmentEngine, device: str = "auto") -> None:
+    def __init__(
+        self, asr: ASRModel, diarization: DiarizationModel, alignment: AlignmentEngine, device: str = "auto"
+    ) -> None:
         self.asr = asr
         self.diarization = diarization
         self.alignment = alignment
@@ -247,6 +265,7 @@ class LocalTranscriptionPipeline(TranscriptionPipeline):
         try:
             self.diarization.load("", resolved_device)
         except Exception as exc:
+            logger.warning("diarization model load failed; using single-speaker fallback: %s", exc)
             self._diarization_load_warning = str(exc)
             self.diarization = NullDiarization()
             self.diarization.load("", resolved_device)
@@ -308,7 +327,11 @@ def make_transcript_segment(speaker_id: str, words: list[Word]) -> TranscriptSeg
 def merge_adjacent_segments(segments: list[TranscriptSegment], gap_seconds: float = 0.75) -> list[TranscriptSegment]:
     merged: list[TranscriptSegment] = []
     for segment in segments:
-        if merged and merged[-1].speaker_id == segment.speaker_id and segment.start_time - merged[-1].end_time <= gap_seconds:
+        if (
+            merged
+            and merged[-1].speaker_id == segment.speaker_id
+            and segment.start_time - merged[-1].end_time <= gap_seconds
+        ):
             previous = merged[-1]
             previous.end_time = segment.end_time
             previous.text = f"{previous.text} {segment.text}".strip()

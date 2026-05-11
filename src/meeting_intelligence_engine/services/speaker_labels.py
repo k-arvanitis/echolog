@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from uuid import UUID, uuid4
@@ -12,6 +13,8 @@ from sqlalchemy.orm import Session
 from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.core.schemas import TranscriptResult
 from meeting_intelligence_engine.models import Meeting, SpeakerLabel
+
+logger = logging.getLogger(__name__)
 
 
 INTRO_PATTERNS = [
@@ -79,7 +82,9 @@ def _looks_like_person_name(name: str) -> bool:
     return True
 
 
-def _segment_intro_candidate(speaker_id: str, text: str, start_time: float | None = None) -> SpeakerLabelCandidate | None:
+def _segment_intro_candidate(
+    speaker_id: str, text: str, start_time: float | None = None
+) -> SpeakerLabelCandidate | None:
     stripped = text.strip()
     if not stripped:
         return None
@@ -106,7 +111,7 @@ def _candidate_confidence(text: str, match: re.Match[str]) -> float:
     stripped = text.strip()
     if stripped.endswith((".", "!", "?")):
         confidence += 0.06
-    trailing = stripped[match.end():].strip().lower()
+    trailing = stripped[match.end() :].strip().lower()
     if trailing.startswith(","):
         confidence += 0.04
     if re.search(r"\b(with|and|for|to|of|the|a|an)\s*$", stripped.lower()):
@@ -157,7 +162,14 @@ def _fallback_candidates_with_llm(
     unresolved_speaker_ids: list[str],
     config: Settings = settings,
 ) -> dict[str, SpeakerLabelCandidate]:
-    if not unresolved_speaker_ids or not config.groq_api_key:
+    if not unresolved_speaker_ids:
+        return {}
+    if not config.groq_api_key:
+        logger.info(
+            "GROQ_API_KEY not set; leaving %d speaker(s) unresolved: %s",
+            len(unresolved_speaker_ids),
+            ", ".join(unresolved_speaker_ids),
+        )
         return {}
 
     lines = [
@@ -168,7 +180,7 @@ def _fallback_candidates_with_llm(
     if not lines:
         return {}
 
-    client = Groq(api_key=config.groq_api_key)
+    client = Groq(api_key=config.secret("groq_api_key"))
     response = client.chat.completions.create(
         model=config.analytics_model_name,
         temperature=0.0,
@@ -197,7 +209,8 @@ def _fallback_candidates_with_llm(
     content = response.choices[0].message.content or "{}"
     try:
         payload = json.loads(content)
-    except json.JSONDecodeError:
+    except json.JSONDecodeError as exc:
+        logger.warning("speaker-label LLM returned invalid JSON: %s", exc)
         return {}
 
     resolved: dict[str, SpeakerLabelCandidate] = {}
@@ -229,7 +242,9 @@ def _fallback_candidates_with_llm(
 
 def infer_speaker_labels(transcript: TranscriptResult, config: Settings = settings) -> dict[str, SpeakerLabelCandidate]:
     resolved, blocked = _extract_rule_candidates(transcript)
-    unresolved = [speaker_id for speaker_id in transcript.speakers if speaker_id not in resolved and speaker_id not in blocked]
+    unresolved = [
+        speaker_id for speaker_id in transcript.speakers if speaker_id not in resolved and speaker_id not in blocked
+    ]
     resolved.update(_fallback_candidates_with_llm(transcript, unresolved, config))
     return resolved
 
@@ -273,9 +288,7 @@ def list_speaker_labels(session: Session, meeting_id: UUID) -> list[SpeakerLabel
         raise KeyError(f"Meeting not found: {meeting_id}")
     return list(
         session.scalars(
-            select(SpeakerLabel)
-            .where(SpeakerLabel.meeting_id == str(meeting_id))
-            .order_by(SpeakerLabel.speaker_id)
+            select(SpeakerLabel).where(SpeakerLabel.meeting_id == str(meeting_id)).order_by(SpeakerLabel.speaker_id)
         )
     )
 
