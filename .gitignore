@@ -18,9 +18,11 @@ docs/
 data/
 outputs/
 
-# Evaluation artifacts and downloaded datasets
+# Evaluation artifacts and downloaded datasets — keep only the published headline results
 eval/data/
-eval/results/
+eval/results/*
+!eval/results/ami_eval_all_meetings_en.json
+!eval/results/rag_eval_results.json
 
 # Local sample media
 samples/

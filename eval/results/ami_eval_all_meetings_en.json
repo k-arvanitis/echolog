@@ -1,0 +1,880 @@
+{
+  "average_wer": 0.24990240773816771,
+  "average_filler_light_wer": 0.2065048350178574,
+  "completed_meetings": 30,
+  "failed_meetings": 0,
+  "results": [
+    {
+      "meeting_id": "ES2002a",
+      "wer": 0.3073076923076923,
+      "cer": 0.25646153846153846,
+      "filler_light_wer": 0.26934215970211006,
+      "filler_light_cer": 0.22902310498581271,
+      "reference_word_count": 2600,
+      "predicted_word_count": 2245,
+      "substitutions": 148,
+      "deletions": 503,
+      "insertions": 148,
+      "deleted_fillers": 112,
+      "deleted_short_words": 185,
+      "inserted_short_words": 42,
+      "repeated_reference_words": 4,
+      "numeric_mismatches": 16,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2002a/audio/ES2002a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2002a.A.words.xml",
+        "words/ES2002a.B.words.xml",
+        "words/ES2002a.C.words.xml",
+        "words/ES2002a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1272.64"
+      ]
+    },
+    {
+      "meeting_id": "ES2002b",
+      "wer": 0.2574002574002574,
+      "cer": 0.19602256374834515,
+      "filler_light_wer": 0.20400616332819724,
+      "filler_light_cer": 0.15478472539175414,
+      "reference_word_count": 6993,
+      "predicted_word_count": 5779,
+      "substitutions": 366,
+      "deletions": 1324,
+      "insertions": 110,
+      "deleted_fillers": 336,
+      "deleted_short_words": 534,
+      "inserted_short_words": 13,
+      "repeated_reference_words": 19,
+      "numeric_mismatches": 18,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2002b/audio/ES2002b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2002b.A.words.xml",
+        "words/ES2002b.B.words.xml",
+        "words/ES2002b.C.words.xml",
+        "words/ES2002b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2279.75"
+      ]
+    },
+    {
+      "meeting_id": "ES2003a",
+      "wer": 0.23209028459273798,
+      "cer": 0.1573757688177292,
+      "filler_light_wer": 0.18671548117154813,
+      "filler_light_cer": 0.1254334081174791,
+      "reference_word_count": 2038,
+      "predicted_word_count": 1776,
+      "substitutions": 133,
+      "deletions": 301,
+      "insertions": 39,
+      "deleted_fillers": 77,
+      "deleted_short_words": 144,
+      "inserted_short_words": 10,
+      "repeated_reference_words": 14,
+      "numeric_mismatches": 6,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2003a/audio/ES2003a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2003a.A.words.xml",
+        "words/ES2003a.B.words.xml",
+        "words/ES2003a.C.words.xml",
+        "words/ES2003a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1139.77"
+      ]
+    },
+    {
+      "meeting_id": "ES2003b",
+      "wer": 0.22589144563499033,
+      "cer": 0.1638903439846342,
+      "filler_light_wer": 0.17883280165134172,
+      "filler_light_cer": 0.13061433322369623,
+      "reference_word_count": 5693,
+      "predicted_word_count": 4858,
+      "substitutions": 289,
+      "deletions": 916,
+      "insertions": 81,
+      "deleted_fillers": 255,
+      "deleted_short_words": 446,
+      "inserted_short_words": 23,
+      "repeated_reference_words": 14,
+      "numeric_mismatches": 19,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2003b/audio/ES2003b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2003b.A.words.xml",
+        "words/ES2003b.B.words.xml",
+        "words/ES2003b.C.words.xml",
+        "words/ES2003b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2109.81"
+      ]
+    },
+    {
+      "meeting_id": "ES2004a",
+      "wer": 0.24598316755929608,
+      "cer": 0.19844865985715382,
+      "filler_light_wer": 0.20671521035598706,
+      "filler_light_cer": 0.1682565130260521,
+      "reference_word_count": 2614,
+      "predicted_word_count": 2126,
+      "substitutions": 115,
+      "deletions": 508,
+      "insertions": 20,
+      "deleted_fillers": 108,
+      "deleted_short_words": 191,
+      "inserted_short_words": 2,
+      "repeated_reference_words": 11,
+      "numeric_mismatches": 7,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2004a/audio/ES2004a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2004a.A.words.xml",
+        "words/ES2004a.B.words.xml",
+        "words/ES2004a.C.words.xml",
+        "words/ES2004a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1049.35"
+      ]
+    },
+    {
+      "meeting_id": "ES2004b",
+      "wer": 0.2201685642466361,
+      "cer": 0.16339544271214204,
+      "filler_light_wer": 0.1814780168381665,
+      "filler_light_cer": 0.13433017262338925,
+      "reference_word_count": 6763,
+      "predicted_word_count": 5715,
+      "substitutions": 337,
+      "deletions": 1100,
+      "insertions": 52,
+      "deleted_fillers": 255,
+      "deleted_short_words": 431,
+      "inserted_short_words": 17,
+      "repeated_reference_words": 10,
+      "numeric_mismatches": 24,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2004b/audio/ES2004b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2004b.A.words.xml",
+        "words/ES2004b.B.words.xml",
+        "words/ES2004b.C.words.xml",
+        "words/ES2004b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2345.49"
+      ]
+    },
+    {
+      "meeting_id": "ES2005a",
+      "wer": 0.3534136546184739,
+      "cer": 0.28946670204298225,
+      "filler_light_wer": 0.3132183908045977,
+      "filler_light_cer": 0.25671140939597314,
+      "reference_word_count": 747,
+      "predicted_word_count": 662,
+      "substitutions": 49,
+      "deletions": 150,
+      "insertions": 65,
+      "deleted_fillers": 37,
+      "deleted_short_words": 54,
+      "inserted_short_words": 15,
+      "repeated_reference_words": 2,
+      "numeric_mismatches": 7,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2005a/audio/ES2005a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2005a.A.words.xml",
+        "words/ES2005a.B.words.xml",
+        "words/ES2005a.C.words.xml",
+        "words/ES2005a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-477.88"
+      ]
+    },
+    {
+      "meeting_id": "ES2005b",
+      "wer": 0.2804523424878837,
+      "cer": 0.21102797657774885,
+      "filler_light_wer": 0.23099721059972106,
+      "filler_light_cer": 0.17496312051871418,
+      "reference_word_count": 6190,
+      "predicted_word_count": 4899,
+      "substitutions": 365,
+      "deletions": 1331,
+      "insertions": 40,
+      "deleted_fillers": 327,
+      "deleted_short_words": 573,
+      "inserted_short_words": 15,
+      "repeated_reference_words": 13,
+      "numeric_mismatches": 23,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2005b/audio/ES2005b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2005b.A.words.xml",
+        "words/ES2005b.B.words.xml",
+        "words/ES2005b.C.words.xml",
+        "words/ES2005b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2313.26"
+      ]
+    },
+    {
+      "meeting_id": "ES2006a",
+      "wer": 0.21433717579250722,
+      "cer": 0.16516473217504146,
+      "filler_light_wer": 0.15247678018575853,
+      "filler_light_cer": 0.12087161187457293,
+      "reference_word_count": 2776,
+      "predicted_word_count": 2331,
+      "substitutions": 76,
+      "deletions": 482,
+      "insertions": 37,
+      "deleted_fillers": 134,
+      "deleted_short_words": 211,
+      "inserted_short_words": 26,
+      "repeated_reference_words": 6,
+      "numeric_mismatches": 8,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2006a/audio/ES2006a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2006a.A.words.xml",
+        "words/ES2006a.B.words.xml",
+        "words/ES2006a.C.words.xml",
+        "words/ES2006a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1284.34"
+      ]
+    },
+    {
+      "meeting_id": "ES2006b",
+      "wer": 0.24383164005805516,
+      "cer": 0.19425250242169842,
+      "filler_light_wer": 0.19079176839902337,
+      "filler_light_cer": 0.1561998976633123,
+      "reference_word_count": 6201,
+      "predicted_word_count": 4978,
+      "substitutions": 251,
+      "deletions": 1242,
+      "insertions": 19,
+      "deleted_fillers": 320,
+      "deleted_short_words": 547,
+      "inserted_short_words": 6,
+      "repeated_reference_words": 31,
+      "numeric_mismatches": 39,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2006b/audio/ES2006b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2006b.A.words.xml",
+        "words/ES2006b.B.words.xml",
+        "words/ES2006b.C.words.xml",
+        "words/ES2006b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2183.13"
+      ]
+    },
+    {
+      "meeting_id": "ES2007a",
+      "wer": 0.2553606237816764,
+      "cer": 0.1860593621724029,
+      "filler_light_wer": 0.22881702824396233,
+      "filler_light_cer": 0.16770186335403728,
+      "reference_word_count": 2565,
+      "predicted_word_count": 2215,
+      "substitutions": 173,
+      "deletions": 416,
+      "insertions": 66,
+      "deleted_fillers": 63,
+      "deleted_short_words": 163,
+      "inserted_short_words": 14,
+      "repeated_reference_words": 7,
+      "numeric_mismatches": 8,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2007a/audio/ES2007a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2007a.A.words.xml",
+        "words/ES2007a.B.words.xml",
+        "words/ES2007a.C.words.xml",
+        "words/ES2007a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1206.30"
+      ]
+    },
+    {
+      "meeting_id": "ES2007b",
+      "wer": 0.3045476536042574,
+      "cer": 0.2207411747473268,
+      "filler_light_wer": 0.26382103368475185,
+      "filler_light_cer": 0.1916895534533618,
+      "reference_word_count": 4134,
+      "predicted_word_count": 3375,
+      "substitutions": 330,
+      "deletions": 844,
+      "insertions": 85,
+      "deleted_fillers": 157,
+      "deleted_short_words": 374,
+      "inserted_short_words": 26,
+      "repeated_reference_words": 18,
+      "numeric_mismatches": 35,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2007b/audio/ES2007b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2007b.A.words.xml",
+        "words/ES2007b.B.words.xml",
+        "words/ES2007b.C.words.xml",
+        "words/ES2007b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1685.34"
+      ]
+    },
+    {
+      "meeting_id": "ES2008a",
+      "wer": 0.23125996810207336,
+      "cer": 0.15667801440899373,
+      "filler_light_wer": 0.18932655654383734,
+      "filler_light_cer": 0.1260212923991087,
+      "reference_word_count": 2508,
+      "predicted_word_count": 2224,
+      "substitutions": 156,
+      "deletions": 354,
+      "insertions": 70,
+      "deleted_fillers": 98,
+      "deleted_short_words": 165,
+      "inserted_short_words": 18,
+      "repeated_reference_words": 1,
+      "numeric_mismatches": 5,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2008a/audio/ES2008a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2008a.A.words.xml",
+        "words/ES2008a.B.words.xml",
+        "words/ES2008a.C.words.xml",
+        "words/ES2008a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1043.36"
+      ]
+    },
+    {
+      "meeting_id": "ES2008b",
+      "wer": 0.20987239758226997,
+      "cer": 0.15392955710343015,
+      "filler_light_wer": 0.17001243560135015,
+      "filler_light_cer": 0.12258396161754627,
+      "reference_word_count": 5956,
+      "predicted_word_count": 5202,
+      "substitutions": 320,
+      "deletions": 842,
+      "insertions": 88,
+      "deleted_fillers": 207,
+      "deleted_short_words": 348,
+      "inserted_short_words": 19,
+      "repeated_reference_words": 8,
+      "numeric_mismatches": 35,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2008b/audio/ES2008b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2008b.A.words.xml",
+        "words/ES2008b.B.words.xml",
+        "words/ES2008b.C.words.xml",
+        "words/ES2008b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2231.66"
+      ]
+    },
+    {
+      "meeting_id": "ES2009a",
+      "wer": 0.24713851903760803,
+      "cer": 0.17769421172886518,
+      "filler_light_wer": 0.20887016848364717,
+      "filler_light_cer": 0.15155716195474575,
+      "reference_word_count": 4281,
+      "predicted_word_count": 3631,
+      "substitutions": 286,
+      "deletions": 711,
+      "insertions": 61,
+      "deleted_fillers": 164,
+      "deleted_short_words": 310,
+      "inserted_short_words": 14,
+      "repeated_reference_words": 15,
+      "numeric_mismatches": 17,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2009a/audio/ES2009a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2009a.A.words.xml",
+        "words/ES2009a.B.words.xml",
+        "words/ES2009a.C.words.xml",
+        "words/ES2009a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1402.21"
+      ]
+    },
+    {
+      "meeting_id": "ES2009b",
+      "wer": 0.2273815222594543,
+      "cer": 0.15526662898059168,
+      "filler_light_wer": 0.18575772934617335,
+      "filler_light_cer": 0.12697326621377256,
+      "reference_word_count": 4178,
+      "predicted_word_count": 3561,
+      "substitutions": 227,
+      "deletions": 670,
+      "insertions": 53,
+      "deleted_fillers": 176,
+      "deleted_short_words": 305,
+      "inserted_short_words": 10,
+      "repeated_reference_words": 4,
+      "numeric_mismatches": 10,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2009b/audio/ES2009b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2009b.A.words.xml",
+        "words/ES2009b.B.words.xml",
+        "words/ES2009b.C.words.xml",
+        "words/ES2009b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1435.33"
+      ]
+    },
+    {
+      "meeting_id": "ES2010a",
+      "wer": 0.24829931972789115,
+      "cer": 0.16624143950584128,
+      "filler_light_wer": 0.2266949152542373,
+      "filler_light_cer": 0.15192837465564737,
+      "reference_word_count": 1470,
+      "predicted_word_count": 1335,
+      "substitutions": 110,
+      "deletions": 195,
+      "insertions": 60,
+      "deleted_fillers": 24,
+      "deleted_short_words": 75,
+      "inserted_short_words": 14,
+      "repeated_reference_words": 3,
+      "numeric_mismatches": 4,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2010a/audio/ES2010a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2010a.A.words.xml",
+        "words/ES2010a.B.words.xml",
+        "words/ES2010a.C.words.xml",
+        "words/ES2010a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-644.29"
+      ]
+    },
+    {
+      "meeting_id": "ES2010b",
+      "wer": 0.2050513698630137,
+      "cer": 0.1550251256281407,
+      "filler_light_wer": 0.18571428571428572,
+      "filler_light_cer": 0.14067774881415324,
+      "reference_word_count": 4672,
+      "predicted_word_count": 4197,
+      "substitutions": 247,
+      "deletions": 593,
+      "insertions": 118,
+      "deleted_fillers": 73,
+      "deleted_short_words": 194,
+      "inserted_short_words": 28,
+      "repeated_reference_words": 1,
+      "numeric_mismatches": 30,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2010b/audio/ES2010b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2010b.A.words.xml",
+        "words/ES2010b.B.words.xml",
+        "words/ES2010b.C.words.xml",
+        "words/ES2010b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1751.98"
+      ]
+    },
+    {
+      "meeting_id": "ES2011a",
+      "wer": 0.2986590816741162,
+      "cer": 0.24226200435000836,
+      "filler_light_wer": 0.27005119453924914,
+      "filler_light_cer": 0.22122052704576978,
+      "reference_word_count": 2461,
+      "predicted_word_count": 1911,
+      "substitutions": 141,
+      "deletions": 572,
+      "insertions": 22,
+      "deleted_fillers": 64,
+      "deleted_short_words": 201,
+      "inserted_short_words": 7,
+      "repeated_reference_words": 11,
+      "numeric_mismatches": 12,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2011a/audio/ES2011a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2011a.A.words.xml",
+        "words/ES2011a.B.words.xml",
+        "words/ES2011a.C.words.xml",
+        "words/ES2011a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1113.85"
+      ]
+    },
+    {
+      "meeting_id": "ES2011b",
+      "wer": 0.2546899139262856,
+      "cer": 0.20695318915959485,
+      "filler_light_wer": 0.2276067983463482,
+      "filler_light_cer": 0.18730039451437158,
+      "reference_word_count": 4531,
+      "predicted_word_count": 3646,
+      "substitutions": 207,
+      "deletions": 916,
+      "insertions": 31,
+      "deleted_fillers": 114,
+      "deleted_short_words": 331,
+      "inserted_short_words": 7,
+      "repeated_reference_words": 12,
+      "numeric_mismatches": 16,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2011b/audio/ES2011b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2011b.A.words.xml",
+        "words/ES2011b.B.words.xml",
+        "words/ES2011b.C.words.xml",
+        "words/ES2011b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1581.27"
+      ]
+    },
+    {
+      "meeting_id": "ES2012a",
+      "wer": 0.2624955052139518,
+      "cer": 0.18313427433948606,
+      "filler_light_wer": 0.1833466773418735,
+      "filler_light_cer": 0.1267583741353851,
+      "reference_word_count": 2781,
+      "predicted_word_count": 2263,
+      "substitutions": 144,
+      "deletions": 552,
+      "insertions": 34,
+      "deleted_fillers": 175,
+      "deleted_short_words": 311,
+      "inserted_short_words": 13,
+      "repeated_reference_words": 27,
+      "numeric_mismatches": 7,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2012a/audio/ES2012a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2012a.A.words.xml",
+        "words/ES2012a.B.words.xml",
+        "words/ES2012a.C.words.xml",
+        "words/ES2012a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1104.53"
+      ]
+    },
+    {
+      "meeting_id": "ES2012b",
+      "wer": 0.2781646134618818,
+      "cer": 0.19503163646821972,
+      "filler_light_wer": 0.20624259186092453,
+      "filler_light_cer": 0.14576609804825572,
+      "reference_word_count": 5601,
+      "predicted_word_count": 4492,
+      "substitutions": 351,
+      "deletions": 1158,
+      "insertions": 49,
+      "deleted_fillers": 352,
+      "deleted_short_words": 608,
+      "inserted_short_words": 12,
+      "repeated_reference_words": 33,
+      "numeric_mismatches": 16,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2012b/audio/ES2012b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2012b.A.words.xml",
+        "words/ES2012b.B.words.xml",
+        "words/ES2012b.C.words.xml",
+        "words/ES2012b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2239.67"
+      ]
+    },
+    {
+      "meeting_id": "ES2013a",
+      "wer": 0.25421530479896237,
+      "cer": 0.19305373525557012,
+      "filler_light_wer": 0.2197952218430034,
+      "filler_light_cer": 0.16854237288135593,
+      "reference_word_count": 1542,
+      "predicted_word_count": 1334,
+      "substitutions": 118,
+      "deletions": 241,
+      "insertions": 33,
+      "deleted_fillers": 60,
+      "deleted_short_words": 103,
+      "inserted_short_words": 7,
+      "repeated_reference_words": 3,
+      "numeric_mismatches": 18,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2013a/audio/ES2013a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2013a.A.words.xml",
+        "words/ES2013a.B.words.xml",
+        "words/ES2013a.C.words.xml",
+        "words/ES2013a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-825.17"
+      ]
+    },
+    {
+      "meeting_id": "ES2013b",
+      "wer": 0.22417231751096928,
+      "cer": 0.17266671953056856,
+      "filler_light_wer": 0.1731509191962377,
+      "filler_light_cer": 0.1373795280824194,
+      "reference_word_count": 5014,
+      "predicted_word_count": 4125,
+      "substitutions": 175,
+      "deletions": 919,
+      "insertions": 30,
+      "deleted_fillers": 221,
+      "deleted_short_words": 421,
+      "inserted_short_words": 10,
+      "repeated_reference_words": 26,
+      "numeric_mismatches": 24,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2013b/audio/ES2013b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2013b.A.words.xml",
+        "words/ES2013b.B.words.xml",
+        "words/ES2013b.C.words.xml",
+        "words/ES2013b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2128.63"
+      ]
+    },
+    {
+      "meeting_id": "ES2014a",
+      "wer": 0.26037906137184114,
+      "cer": 0.19454793275783736,
+      "filler_light_wer": 0.1987179487179487,
+      "filler_light_cer": 0.1500193199381762,
+      "reference_word_count": 2216,
+      "predicted_word_count": 1875,
+      "substitutions": 122,
+      "deletions": 398,
+      "insertions": 57,
+      "deleted_fillers": 129,
+      "deleted_short_words": 191,
+      "inserted_short_words": 14,
+      "repeated_reference_words": 7,
+      "numeric_mismatches": 5,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2014a/audio/ES2014a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2014a.A.words.xml",
+        "words/ES2014a.B.words.xml",
+        "words/ES2014a.C.words.xml",
+        "words/ES2014a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1149.01"
+      ]
+    },
+    {
+      "meeting_id": "ES2014b",
+      "wer": 0.25555007400098667,
+      "cer": 0.19173992914315707,
+      "filler_light_wer": 0.21424820584631543,
+      "filler_light_cer": 0.16063526909752,
+      "reference_word_count": 6081,
+      "predicted_word_count": 5070,
+      "substitutions": 399,
+      "deletions": 1083,
+      "insertions": 72,
+      "deleted_fillers": 253,
+      "deleted_short_words": 461,
+      "inserted_short_words": 26,
+      "repeated_reference_words": 10,
+      "numeric_mismatches": 26,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2014b/audio/ES2014b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2014b.A.words.xml",
+        "words/ES2014b.B.words.xml",
+        "words/ES2014b.C.words.xml",
+        "words/ES2014b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2319.89"
+      ]
+    },
+    {
+      "meeting_id": "ES2015a",
+      "wer": 0.2131766680654637,
+      "cer": 0.15602419761384642,
+      "filler_light_wer": 0.16427289048473967,
+      "filler_light_cer": 0.12042575650950035,
+      "reference_word_count": 2383,
+      "predicted_word_count": 2049,
+      "substitutions": 128,
+      "deletions": 357,
+      "insertions": 23,
+      "deleted_fillers": 108,
+      "deleted_short_words": 169,
+      "inserted_short_words": 5,
+      "repeated_reference_words": 6,
+      "numeric_mismatches": 5,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2015a/audio/ES2015a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2015a.A.words.xml",
+        "words/ES2015a.B.words.xml",
+        "words/ES2015a.C.words.xml",
+        "words/ES2015a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1146.56"
+      ]
+    },
+    {
+      "meeting_id": "ES2015b",
+      "wer": 0.24517576664173524,
+      "cer": 0.1876695722449922,
+      "filler_light_wer": 0.20535997462733904,
+      "filler_light_cer": 0.15851753964440174,
+      "reference_word_count": 6685,
+      "predicted_word_count": 5553,
+      "substitutions": 347,
+      "deletions": 1212,
+      "insertions": 80,
+      "deleted_fillers": 255,
+      "deleted_short_words": 492,
+      "inserted_short_words": 21,
+      "repeated_reference_words": 21,
+      "numeric_mismatches": 39,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2015b/audio/ES2015b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2015b.A.words.xml",
+        "words/ES2015b.B.words.xml",
+        "words/ES2015b.C.words.xml",
+        "words/ES2015b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2294.86"
+      ]
+    },
+    {
+      "meeting_id": "ES2016a",
+      "wer": 0.24839905628581058,
+      "cer": 0.1812701239980818,
+      "filler_light_wer": 0.2067238912732475,
+      "filler_light_cer": 0.1521181001283697,
+      "reference_word_count": 2967,
+      "predicted_word_count": 2471,
+      "substitutions": 167,
+      "deletions": 533,
+      "insertions": 37,
+      "deleted_fillers": 110,
+      "deleted_short_words": 237,
+      "inserted_short_words": 13,
+      "repeated_reference_words": 11,
+      "numeric_mismatches": 3,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2016a/audio/ES2016a.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2016a.A.words.xml",
+        "words/ES2016a.B.words.xml",
+        "words/ES2016a.C.words.xml",
+        "words/ES2016a.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-1384.19"
+      ]
+    },
+    {
+      "meeting_id": "ES2016b",
+      "wer": 0.19220727053625225,
+      "cer": 0.1403766687857597,
+      "filler_light_wer": 0.15204060054979912,
+      "filler_light_cer": 0.11102874557285232,
+      "reference_word_count": 4979,
+      "predicted_word_count": 4349,
+      "substitutions": 245,
+      "deletions": 671,
+      "insertions": 41,
+      "deleted_fillers": 171,
+      "deleted_short_words": 295,
+      "inserted_short_words": 9,
+      "repeated_reference_words": 6,
+      "numeric_mismatches": 19,
+      "chunk_count": 1,
+      "chunking_strategy": "fixed_chunking",
+      "audio_path": "eval/data/amicorpus/ES2016b/audio/ES2016b.Mix-Headset.wav",
+      "transcript_sources": [
+        "words/ES2016b.A.words.xml",
+        "words/ES2016b.B.words.xml",
+        "words/ES2016b.C.words.xml",
+        "words/ES2016b.D.words.xml"
+      ],
+      "chunk_ranges": [
+        "0.00-2412.22"
+      ]
+    }
+  ],
+  "failures": [],
+  "_note": "Verbatim reference/prediction transcripts stripped to keep the repo light; regenerate the full output with: make eval-ami"
+}

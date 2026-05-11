@@ -28,7 +28,9 @@ Per-meeting query exists as a drill-down. The primary value is the **shared meet
 
 ## Demo
 
-> Screenshots and a video walkthrough will be added here.
+Run `make stack` and open `http://localhost:3000` for the UI, or hit the
+interactive API docs at `http://localhost:8001/docs`. Screenshots live in
+[`assets/`](assets/).
 
 The app is a three-pane shell:
 
@@ -248,6 +250,9 @@ All env vars in one place: `src/meeting_intelligence_engine/config.py`. Frontend
 | `OPENAI_API_KEY` | — | RAG eval judge. Not needed at runtime. |
 | `HF_TOKEN` | — | **Required.** Pyannote model download. |
 | `MIE_API_PORT` | `8001` | FastAPI port. |
+| `MIE_RELOAD` | `false` | Uvicorn auto-reload (dev only). |
+| `MIE_LOG_LEVEL` | `INFO` | Root log level. |
+| `MIE_API_KEY` | — | If set, side-effecting / paid-API endpoints require it in an `X-API-Key` header. Blank = open local dev. |
 | `MIE_CORS_ALLOW_ORIGINS` | `["http://localhost:3000","http://127.0.0.1:3000"]` | JSON list of allowed frontend origins. |
 | `MIE_ASR_MODEL_NAME` | `whisper-large-v3` | Groq Whisper model. |
 | `MIE_ASR_CHUNK_SECONDS` | `600` | Max seconds per ASR chunk. |
@@ -277,7 +282,9 @@ See `.env.example` for the full list with safe placeholder values.
 ```text
 recall-mie/
 ├── src/meeting_intelligence_engine/
-│   ├── api/main.py            # FastAPI app (CORS, endpoints, lifespan)
+│   ├── api/                   # FastAPI: main.py (app factory + lifespan + error handler),
+│   │                          #   routes/ (meetings, query, privacy, system),
+│   │                          #   deps.py (DI: session, API-key guard), schemas.py
 │   ├── api/static/            # Built-in static UI (smoke testing)
 │   ├── workers/               # Celery tasks: transcribe, analytics, indexing
 │   ├── services/              # Pipeline stages: meetings, analytics,
@@ -286,21 +293,26 @@ recall-mie/
 │   ├── eval/                  # AMI WER + RAG eval harnesses
 │   ├── core/                  # Pydantic schemas, abstract interfaces
 │   ├── implementations/       # Concrete ASR + diarization adapters
-│   ├── audio.py / db.py / models.py / config.py / cli.py / exporters.py
+│   ├── audio.py / db.py / models.py / config.py / cli.py / exporters.py / logging_config.py
 │   └── __init__.py
 ├── frontend/                  # Next.js 14 app router
 │   ├── app/                   # layout.tsx, page.tsx, globals.css
 │   ├── components/            # Sidebar, MeetingDetail, *Tab, CrossMeetingPanel
 │   ├── lib/api.ts             # Typed fetch + backend → frontend shape mapping
 │   └── lib/toast.tsx          # Lightweight toast system
-├── tests/                     # 29 tests, all external services mocked
+├── tests/
+│   ├── unit/                  # Pure logic: chunking, alignment, eval scoring, analytics
+│   ├── integration/           # FastAPI app + DB + ffmpeg, all external services mocked
+│   └── conftest.py            # `make_app` fixture (fresh app against temp SQLite)
 ├── eval/
 │   ├── rag_qa/                # 50-question RAG fixture
-│   └── results/               # Eval outputs (gitignored)
-├── .github/workflows/ci.yml   # Ruff + pytest on every push
+│   └── results/               # Eval outputs — published headline JSONs tracked, rest gitignored
+├── assets/                    # Screenshots / diagrams for the README
+├── .github/workflows/ci.yml   # ruff check + ruff format --check + pytest on every push
+├── Dockerfile / .dockerignore # Multi-stage runtime image (non-root) for API + worker
 ├── docker-compose.yml         # Postgres / Redis / Qdrant
-├── Makefile                   # infra / api / worker / frontend / stack / test / lint / eval-*
-├── pyproject.toml             # uv-managed, pinned Python ≥ 3.12
+├── Makefile                   # infra / api / worker / frontend / stack / test / lint / docker-build / eval-*
+├── pyproject.toml             # uv-managed, pinned Python ≥ 3.12, ruff config inline
 └── .env.example
 ```
 
@@ -317,14 +329,16 @@ In practice, the value compounds the more meetings you store, because cross-meet
 
 ## API
 
+Interactive docs (OpenAPI / Swagger): `http://localhost:8001/docs`.
+
 ```text
 GET    /health
 GET    /                              ← FastAPI static UI (smoke testing)
 
-POST   /meetings/upload               ← multipart {file, title}
+POST   /meetings/upload               ← multipart {file, title}                  · guarded
 GET    /meetings                      ← list
 GET    /meetings/{id}
-DELETE /meetings/{id}
+DELETE /meetings/{id}                                                            · guarded
 GET    /meetings/{id}/transcript
 GET    /meetings/{id}/segments
 GET    /meetings/{id}/speaker-labels
@@ -333,14 +347,18 @@ GET    /meetings/{id}/action-items
 GET    /meetings/{id}/decisions
 GET    /meetings/{id}/topics
 
-POST   /meetings/{id}/query           ← single-meeting RAG
-POST   /query                         ← cross-meeting RAG
+POST   /meetings/{id}/query           ← single-meeting RAG                        · guarded
+POST   /query                         ← cross-meeting RAG                         · guarded
+POST   /knowledge/query               ← alias of /query                           · guarded
 
-POST   /meetings/{id}/retention                ← {retention_days}
-POST   /meetings/{id}/privacy/purge-raw-audio
-POST   /privacy/cleanup-expired
+POST   /meetings/{id}/retention                ← {retention_days}                 · guarded
+POST   /meetings/{id}/privacy/purge-raw-audio                                     · guarded
+POST   /privacy/cleanup-expired                                                   · guarded
 GET    /privacy/settings
 ```
+
+`· guarded` endpoints require an `X-API-Key: <MIE_API_KEY>` header **when `MIE_API_KEY` is set** —
+they cause side effects or call paid APIs. With no key configured (the local-dev default) the guard is a no-op.
 
 Cross-meeting query example:
 
@@ -388,7 +406,7 @@ uv run meeting-transcribe \
 
 # evaluation
 uv run mie-eval-ami --csv eval/results/ami.csv --json eval/results/ami.json
-uv run mie-eval-rag --qa-file eval/rag_qa/all_meetings_qa.json --output eval/results/rag.json
+uv run mie-eval-rag --qa-dir eval/rag_qa --json eval/results/rag_eval_results.json
 ```
 
 ---
@@ -396,17 +414,17 @@ uv run mie-eval-rag --qa-file eval/rag_qa/all_meetings_qa.json --output eval/res
 ## Tests
 
 ```bash
-make test     # pytest, 29 tests, all external services mocked
-make lint     # ruff
+make test     # pytest — 31 tests under tests/unit and tests/integration, all external services mocked
+make lint     # ruff check + ruff format --check
 ```
 
-CI runs both on every push to `main` and every PR.
+CI runs lint, format-check, and tests on every push to `main` and every PR.
 
 ---
 
 ## Known Limitations
 
-- **Single-tenant.** No auth, no workspace isolation. Anyone with API access can read every meeting.
+- **Single-tenant.** No real auth or workspace isolation. The optional `MIE_API_KEY` header guard is a coarse stopgap on side-effecting / paid-API endpoints — and the Next.js UI doesn't send it, so enabling it currently locks the UI out of upload/query/delete. Anyone with API access can read every meeting.
 - **No live capture.** Batch upload only; Zoom-bot integration is in the spec but not wired up.
 - **Diarization fragility.** Overlapping speech, remote-call compression, and inconsistent mic quality degrade segmentation. Repair heuristics catch the most common cases but are not a learned correction layer.
 - **Speaker naming requires self-introduction.** If no one says "this is Alice", the rule-based pass leaves `SPEAKER_03`. The LLM fallback only fires when there's clear textual evidence; nicknames and indirect references aren't normalized.
@@ -433,13 +451,14 @@ CI runs both on every push to `main` and every PR.
 
 The current repo is a strong end-to-end prototype. The items below are deliberate next-product concerns, not hidden gaps:
 
-- authentication and workspace isolation;
+- real authentication and workspace isolation (the `X-API-Key` guard is a coarse stopgap, not user auth);
 - HTTPS, reverse proxy, production deployment hardening;
 - encryption at rest, KMS-managed keys, formal audit logging;
 - participant consent capture and recording disclosure;
 - PII redaction beyond manual retention controls;
 - Zoom / Meet / Teams live-capture bots;
-- object storage (S3 / MinIO) instead of local filesystem.
+- object storage (S3 / MinIO) instead of local filesystem;
+- proper schema migrations — `db.py` runs a small idempotent column-add shim on startup; Alembic is the next step.
 
 ---
 
