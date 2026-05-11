@@ -1,9 +1,7 @@
 from __future__ import annotations
 
-from collections.abc import Iterator
-
 from sqlalchemy import create_engine, inspect, text
-from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
 from meeting_intelligence_engine.config import settings
 
@@ -50,8 +48,3 @@ def add_missing_columns() -> None:
     with engine.begin() as connection:
         for statement in statements:
             connection.execute(text(statement))
-
-
-def get_session() -> Iterator[Session]:
-    with SessionLocal() as session:
-        yield session
