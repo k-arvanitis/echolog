@@ -34,9 +34,7 @@ def test_load_rag_qa_file_uses_minimal_schema(tmp_path: Path) -> None:
 def test_load_rag_qa_sets_skips_combined_bundle(tmp_path: Path) -> None:
     (tmp_path / "all_meetings_qa.json").write_text("[]", encoding="utf-8")
     (tmp_path / "ES2004a.json").write_text(
-        json.dumps(
-            {"meeting_id": "ES2004a", "qa_pairs": [{"id": "q1", "question": "Q", "gold_answer": "A"}]}
-        ),
+        json.dumps({"meeting_id": "ES2004a", "qa_pairs": [{"id": "q1", "question": "Q", "gold_answer": "A"}]}),
         encoding="utf-8",
     )
 
@@ -71,7 +69,12 @@ def test_evaluate_rag_qa_sets_uses_query_and_scores(monkeypatch, tmp_path: Path)
     )
     monkeypatch.setattr(
         "meeting_intelligence_engine.eval.rag._build_ragas_metrics",
-        lambda _settings: {"faithfulness": object(), "answer_relevancy": object(), "context_precision": object(), "context_recall": object()},
+        lambda _settings: {
+            "faithfulness": object(),
+            "answer_relevancy": object(),
+            "context_precision": object(),
+            "context_recall": object(),
+        },
     )
     monkeypatch.setattr(
         "meeting_intelligence_engine.eval.rag._score_ragas_sample",

@@ -3,7 +3,6 @@ from __future__ import annotations
 import importlib
 import shutil
 import subprocess
-import sys
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from uuid import UUID
@@ -12,38 +11,27 @@ import pytest
 from fastapi.testclient import TestClient
 
 
-def import_privacy_test_app(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'privacy.db'}")
-    monkeypatch.setenv("REDIS_URL", "memory://")
-    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
-    monkeypatch.setenv("MIE_DATA_DIR", str(tmp_path / "data"))
-    monkeypatch.setenv("GROQ_API_KEY", "test")
-    monkeypatch.setenv("HF_TOKEN", "test")
-    monkeypatch.setenv("MIE_RAG_ENABLED", "false")
-    for module_name in [
-        "meeting_intelligence_engine.config",
-        "meeting_intelligence_engine.db",
-        "meeting_intelligence_engine.models",
-        "meeting_intelligence_engine.services.meetings",
-        "meeting_intelligence_engine.api.main",
-        "meeting_intelligence_engine.workers.celery_app",
-        "meeting_intelligence_engine.workers.transcription",
-        "meeting_intelligence_engine.workers.indexing",
-    ]:
-        sys.modules.pop(module_name, None)
-    return importlib.import_module("meeting_intelligence_engine.api.main")
-
-
 @pytest.mark.skipif(shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None, reason="ffmpeg required")
-def test_privacy_endpoints(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    app_module = import_privacy_test_app(monkeypatch, tmp_path)
+def test_privacy_endpoints(make_app, tmp_path: Path) -> None:
+    app_module = make_app(db_name="privacy.db")
     meetings_module = importlib.import_module("meeting_intelligence_engine.services.meetings")
     db_module = importlib.import_module("meeting_intelligence_engine.db")
     db_module.init_db()
 
     audio_path = tmp_path / "sample.mp3"
     subprocess.run(
-        ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-f", "lavfi", "-i", "sine=frequency=440:duration=1", str(audio_path)],
+        [
+            "ffmpeg",
+            "-hide_banner",
+            "-loglevel",
+            "error",
+            "-y",
+            "-f",
+            "lavfi",
+            "-i",
+            "sine=frequency=440:duration=1",
+            str(audio_path),
+        ],
         check=True,
     )
 

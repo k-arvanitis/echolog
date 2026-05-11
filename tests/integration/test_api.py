@@ -3,9 +3,8 @@ from __future__ import annotations
 import importlib
 import shutil
 import subprocess
-import sys
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid4
 
 import pytest
 from fastapi.testclient import TestClient
@@ -20,54 +19,6 @@ from meeting_intelligence_engine.core.schemas import (
     TranscriptSegment,
     Word,
 )
-
-
-def import_test_app(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'test.db'}")
-    monkeypatch.setenv("REDIS_URL", "memory://")
-    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
-    monkeypatch.setenv("MIE_DATA_DIR", str(tmp_path / "data"))
-    monkeypatch.setenv("GROQ_API_KEY", "test")
-    monkeypatch.setenv("HF_TOKEN", "test")
-    monkeypatch.setenv("MIE_RAG_ENABLED", "false")
-
-    for module_name in [
-        "meeting_intelligence_engine.config",
-        "meeting_intelligence_engine.db",
-        "meeting_intelligence_engine.models",
-        "meeting_intelligence_engine.services.meetings",
-        "meeting_intelligence_engine.workers.celery_app",
-        "meeting_intelligence_engine.workers.transcription",
-        "meeting_intelligence_engine.workers.indexing",
-        "meeting_intelligence_engine.api.main",
-    ]:
-        sys.modules.pop(module_name, None)
-
-    return importlib.import_module("meeting_intelligence_engine.api.main")
-
-
-def import_test_app_with_rag(monkeypatch: pytest.MonkeyPatch, tmp_path: Path):
-    monkeypatch.setenv("DATABASE_URL", f"sqlite:///{tmp_path / 'test.db'}")
-    monkeypatch.setenv("REDIS_URL", "memory://")
-    monkeypatch.setenv("CELERY_TASK_ALWAYS_EAGER", "true")
-    monkeypatch.setenv("MIE_DATA_DIR", str(tmp_path / "data"))
-    monkeypatch.setenv("GROQ_API_KEY", "test")
-    monkeypatch.setenv("HF_TOKEN", "test")
-    monkeypatch.setenv("MIE_RAG_ENABLED", "true")
-
-    for module_name in [
-        "meeting_intelligence_engine.config",
-        "meeting_intelligence_engine.db",
-        "meeting_intelligence_engine.models",
-        "meeting_intelligence_engine.services.meetings",
-        "meeting_intelligence_engine.workers.celery_app",
-        "meeting_intelligence_engine.workers.transcription",
-        "meeting_intelligence_engine.workers.indexing",
-        "meeting_intelligence_engine.api.main",
-    ]:
-        sys.modules.pop(module_name, None)
-
-    return importlib.import_module("meeting_intelligence_engine.api.main")
 
 
 def fake_transcribe_and_diarize_stage(audio_path: Path, meeting_id: UUID, _config, progress) -> TranscriptResult:
@@ -85,7 +36,12 @@ def fake_transcribe_and_diarize_stage(audio_path: Path, meeting_id: UUID, _confi
                 start_time=0.0,
                 end_time=1.0,
                 text="Hi, I'm Jason Somerville.",
-                words=[Word(text="Hi", start=0.0, end=0.1), Word(text="I'm", start=0.2, end=0.4), Word(text="Jason", start=0.5, end=0.7), Word(text="Somerville", start=0.7, end=1.0)],
+                words=[
+                    Word(text="Hi", start=0.0, end=0.1),
+                    Word(text="I'm", start=0.2, end=0.4),
+                    Word(text="Jason", start=0.5, end=0.7),
+                    Word(text="Somerville", start=0.7, end=1.0),
+                ],
             ),
             TranscriptSegment(
                 speaker_id="SPEAKER_00",
@@ -94,7 +50,7 @@ def fake_transcribe_and_diarize_stage(audio_path: Path, meeting_id: UUID, _confi
                 end_time=2.0,
                 text="hello meeting",
                 words=[Word(text="hello", start=1.1, end=1.4), Word(text="meeting", start=1.5, end=2.0)],
-            )
+            ),
         ],
         metadata={
             "asr_model_name": "fake-asr",
@@ -108,8 +64,8 @@ def fake_transcribe_and_diarize_stage(audio_path: Path, meeting_id: UUID, _confi
 
 
 @pytest.mark.skipif(shutil.which("ffmpeg") is None or shutil.which("ffprobe") is None, reason="ffmpeg required")
-def test_upload_process_and_fetch_transcript(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    app_module = import_test_app(monkeypatch, tmp_path)
+def test_upload_process_and_fetch_transcript(make_app, monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
+    app_module = make_app()
     meetings_module = importlib.import_module("meeting_intelligence_engine.services.meetings")
     analytics_module = importlib.import_module("meeting_intelligence_engine.services.analytics")
     monkeypatch.setattr(meetings_module, "transcribe_and_diarize_stage", fake_transcribe_and_diarize_stage)
@@ -232,18 +188,39 @@ def test_upload_process_and_fetch_transcript(monkeypatch: pytest.MonkeyPatch, tm
         assert meeting_after_delete.status_code == 404
 
 
-def test_root_ui_serves_html(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    app_module = import_test_app(monkeypatch, tmp_path)
+def test_health_and_root_ui(make_app) -> None:
+    app_module = make_app()
     with TestClient(app_module.app) as client:
+        assert client.get("/health").json() == {"status": "ok"}
         response = client.get("/")
         assert response.status_code == 200
         assert "<!doctype html>" in response.text.lower()
 
 
-def test_query_routes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
-    app_module = import_test_app_with_rag(monkeypatch, tmp_path)
+def test_query_request_validation(make_app) -> None:
+    app_module = make_app(rag_enabled=True)
+    with TestClient(app_module.app) as client:
+        assert client.post("/query", json={"query": "   "}).status_code == 422
+        assert client.post("/query", json={"query": "ok", "top_k": 99}).status_code == 422
+        assert client.post("/query", json={}).status_code == 422
+
+
+def test_api_key_guard_blocks_side_effects(make_app) -> None:
+    app_module = make_app(extra_env={"MIE_API_KEY": "s3cret"})
+    with TestClient(app_module.app) as client:
+        assert client.delete(f"/meetings/{uuid4()}").status_code == 401
+        assert client.delete(f"/meetings/{uuid4()}", headers={"X-API-Key": "wrong"}).status_code == 401
+        # read endpoints stay open
+        assert client.get("/meetings").status_code == 200
+        # correct key passes the guard (then 404 because the meeting does not exist)
+        assert client.delete(f"/meetings/{uuid4()}", headers={"X-API-Key": "s3cret"}).status_code == 404
+
+
+def test_query_routes(make_app, monkeypatch: pytest.MonkeyPatch) -> None:
+    app_module = make_app(rag_enabled=True)
+    query_routes = importlib.import_module("meeting_intelligence_engine.api.routes.query")
     monkeypatch.setattr(
-        app_module,
+        query_routes,
         "query_markdown_knowledge",
         lambda query, top_k=5, meeting_ids=None: {
             "answer": f"answer:{query}",
@@ -252,7 +229,7 @@ def test_query_routes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
         },
     )
     monkeypatch.setattr(
-        app_module,
+        query_routes,
         "query_single_meeting",
         lambda meeting_id, query, top_k=5: {
             "answer": f"single:{query}:{meeting_id}",
@@ -260,12 +237,22 @@ def test_query_routes(monkeypatch: pytest.MonkeyPatch, tmp_path: Path) -> None:
             "processing_time_ms": 1,
         },
     )
-    meetings_module = importlib.import_module("meeting_intelligence_engine.services.meetings")
     db_module = importlib.import_module("meeting_intelligence_engine.db")
+    models_module = importlib.import_module("meeting_intelligence_engine.models")
     db_module.init_db()
-    session_factory = db_module.SessionLocal
-    with session_factory() as session:
-        meetings_module.create_meeting_from_file(session, Path("samples/voice-sample.mp3"), title="Query Test")
+    with db_module.SessionLocal() as session:
+        session.add(
+            models_module.Meeting(
+                id=str(uuid4()),
+                title="Query Test",
+                source="upload",
+                status="completed",
+                processing_stage="completed",
+                progress_percent=100.0,
+                raw_audio_path=str(Path("/tmp/query-test.wav")),
+            )
+        )
+        session.commit()
 
     with TestClient(app_module.app) as client:
         response = client.post("/query", json={"query": "test", "top_k": 3, "meeting_ids": ["m1"]})

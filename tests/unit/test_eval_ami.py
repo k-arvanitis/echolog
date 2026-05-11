@@ -4,12 +4,12 @@ from pathlib import Path
 
 from meeting_intelligence_engine.eval.ami import (
     SpeechChunk,
+    detect_speech_chunks,
     evaluate_ami_meeting,
     normalize_for_filler_light_wer,
     normalize_for_wer,
     parse_ami_meeting_reference,
     word_error_rate,
-    detect_speech_chunks,
 )
 
 
@@ -85,6 +85,9 @@ class _StubSettings:
     asr_chunk_seconds = 600
     device = "cpu"
 
+    def secret(self, name: str) -> str | None:
+        return getattr(self, name)
+
 
 def test_evaluate_ami_meeting_uses_normalized_reference_and_prediction(monkeypatch, tmp_path: Path) -> None:
     audio_path = tmp_path / "ES2005a.Mix-Headset.wav"
@@ -103,11 +106,18 @@ def test_evaluate_ami_meeting_uses_normalized_reference_and_prediction(monkeypat
     )
 
     monkeypatch.setattr("meeting_intelligence_engine.eval.ami.validate_audio", lambda *args, **kwargs: 1.0)
-    monkeypatch.setattr("meeting_intelligence_engine.eval.ami.normalize_audio", lambda source, target: target.write_bytes(b"RIFF"))
+    monkeypatch.setattr(
+        "meeting_intelligence_engine.eval.ami.normalize_audio", lambda source, target: target.write_bytes(b"RIFF")
+    )
     monkeypatch.setattr("meeting_intelligence_engine.eval.ami.resolve_device", lambda device: device)
-    monkeypatch.setattr("meeting_intelligence_engine.eval.ami.detect_speech_chunks", lambda *_args, **_kwargs: [SpeechChunk(0.0, 1.0)])
+    monkeypatch.setattr(
+        "meeting_intelligence_engine.eval.ami.detect_speech_chunks", lambda *_args, **_kwargs: [SpeechChunk(0.0, 1.0)]
+    )
     monkeypatch.setattr("meeting_intelligence_engine.eval.ami.probe_duration", lambda _path: 1.0)
-    monkeypatch.setattr("meeting_intelligence_engine.eval.ami.extract_audio_range", lambda source, target, start, duration: target.write_bytes(b"RIFF"))
+    monkeypatch.setattr(
+        "meeting_intelligence_engine.eval.ami.extract_audio_range",
+        lambda source, target, start, duration: target.write_bytes(b"RIFF"),
+    )
 
     class _StubASR:
         def __init__(self, **kwargs):

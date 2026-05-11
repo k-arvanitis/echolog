@@ -3,13 +3,19 @@ from __future__ import annotations
 import shutil
 import subprocess
 from pathlib import Path
+from uuid import uuid4
 
 import pytest
 
 from meeting_intelligence_engine.audio import normalize_audio, validate_audio
-from uuid import uuid4
-
-from meeting_intelligence_engine.core.schemas import ASRSegment, AnalyticsResult, SpeakerSegment, TranscriptResult, TranscriptSegment, Word
+from meeting_intelligence_engine.core.schemas import (
+    AnalyticsResult,
+    ASRSegment,
+    SpeakerSegment,
+    TranscriptResult,
+    TranscriptSegment,
+    Word,
+)
 from meeting_intelligence_engine.implementations.local_pipeline import TimeOverlapAlignment, clean_transcript_segments
 from meeting_intelligence_engine.services.analytics import extract_analytics, sanitize_analytics_payload
 from meeting_intelligence_engine.services.segment_repairs import repair_intro_fragments
@@ -86,9 +92,7 @@ def test_clean_transcript_segments_drops_empty_and_merges_tiny_fragment() -> Non
 
     cleaned = clean_transcript_segments(aligned)
 
-    assert [(segment.speaker_id, segment.text) for segment in cleaned] == [
-        ("SPEAKER_01", "I think this is fine")
-    ]
+    assert [(segment.speaker_id, segment.text) for segment in cleaned] == [("SPEAKER_01", "I think this is fine")]
 
 
 def test_sanitize_analytics_payload_coerces_sloppy_llm_types() -> None:
@@ -156,7 +160,9 @@ def test_infer_speaker_labels_prefers_complete_intro_over_truncated_fragment() -
         meeting_id=uuid4(),
         speakers=["SPEAKER_01"],
         segments=[
-            TranscriptSegment(speaker_id="SPEAKER_01", start_time=0.0, end_time=1.0, text="I'm Lucy Strokes, PA to Rita."),
+            TranscriptSegment(
+                speaker_id="SPEAKER_01", start_time=0.0, end_time=1.0, text="I'm Lucy Strokes, PA to Rita."
+            ),
             TranscriptSegment(speaker_id="SPEAKER_01", start_time=1.1, end_time=1.8, text="I'm Sue Carpenter with a"),
         ],
         metadata={},
@@ -172,7 +178,9 @@ def test_apply_speaker_labels_drops_conflicting_truncated_intro_from_display() -
         meeting_id=uuid4(),
         speakers=["SPEAKER_01"],
         segments=[
-            TranscriptSegment(speaker_id="SPEAKER_01", start_time=0.0, end_time=1.0, text="I'm Lucy Strokes, PA to Rita."),
+            TranscriptSegment(
+                speaker_id="SPEAKER_01", start_time=0.0, end_time=1.0, text="I'm Lucy Strokes, PA to Rita."
+            ),
             TranscriptSegment(speaker_id="SPEAKER_01", start_time=1.1, end_time=1.8, text="I'm Sue Carpenter with a"),
         ],
         metadata={},
@@ -205,9 +213,15 @@ def test_repair_intro_fragments_merges_broken_adjacent_intro_turns() -> None:
         meeting_id=uuid4(),
         speakers=["SPEAKER_01", "SPEAKER_02"],
         segments=[
-            TranscriptSegment(speaker_id="SPEAKER_01", start_time=80.3, end_time=82.28, text="I'm Lucy Strokes, PA to Rita."),
-            TranscriptSegment(speaker_id="SPEAKER_01", start_time=83.46, end_time=84.96, text="I'm Sue Carpenter with a"),
-            TranscriptSegment(speaker_id="SPEAKER_02", start_time=84.96, end_time=87.02, text="D and I'm the sales director."),
+            TranscriptSegment(
+                speaker_id="SPEAKER_01", start_time=80.3, end_time=82.28, text="I'm Lucy Strokes, PA to Rita."
+            ),
+            TranscriptSegment(
+                speaker_id="SPEAKER_01", start_time=83.46, end_time=84.96, text="I'm Sue Carpenter with a"
+            ),
+            TranscriptSegment(
+                speaker_id="SPEAKER_02", start_time=84.96, end_time=87.02, text="D and I'm the sales director."
+            ),
         ],
         metadata={},
     )
@@ -224,7 +238,9 @@ def test_repair_intro_fragments_moves_short_leading_sentence_to_previous_segment
         meeting_id=uuid4(),
         speakers=["SPEAKER_04", "SPEAKER_02"],
         segments=[
-            TranscriptSegment(speaker_id="SPEAKER_04", start_time=159.9, end_time=162.76, text="I got held up in a previous"),
+            TranscriptSegment(
+                speaker_id="SPEAKER_04", start_time=159.9, end_time=162.76, text="I got held up in a previous"
+            ),
             TranscriptSegment(
                 speaker_id="SPEAKER_02",
                 start_time=162.76,
