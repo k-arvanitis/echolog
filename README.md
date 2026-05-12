@@ -63,48 +63,37 @@ Most meeting-intelligence demos stop at "transcribe one file and summarize it." 
 
 ## Architecture
 
-```text
-┌──────────────┐         ┌────────────────┐
-│  Next.js UI  │◄──────► │   FastAPI      │
-│  (port 3000) │  HTTP   │   (port 8001)  │
-└──────────────┘         └───────┬────────┘
-                                 │
-        ┌────────────────────────┼────────────────────────┐
-        │                        │                        │
-        ▼                        ▼                        ▼
-   ┌─────────┐            ┌────────────┐          ┌─────────────┐
-   │ Postgres│            │   Redis    │          │   Qdrant    │
-   │ (state) │            │  (broker)  │          │ (retrieval) │
-   └─────────┘            └─────┬──────┘          └──────▲──────┘
-                                │                        │
-                                ▼                        │
-                       ┌──────────────────┐              │
-                       │  Celery worker   │              │
-                       │                  │              │
-                       │  • transcribe    │              │
-                       │  • analytics     │              │
-                       │  • indexing  ────┼──► Ollama ───┘
-                       └──────────────────┘    embeddings
-                              │
-                              ├──► Groq Whisper (ASR)
-                              ├──► pyannote (diarization)
-                              └──► Groq chat (analytics + answer)
+```mermaid
+flowchart LR
+    UI["Next.js UI<br/>:3000"] -- "HTTP / JSON" --> API["FastAPI<br/>:8001"]
+    API --> PG[("PostgreSQL<br/>meeting state")]
+    API --> RDS[("Redis<br/>Celery broker")]
+    API --> QD[("Qdrant<br/>hybrid retrieval")]
+    RDS --> W["Celery worker<br/>transcribe · analytics · indexing"]
+    W -- "ASR" --> GW["Groq Whisper"]
+    W -- "diarization" --> PY["pyannote"]
+    W -- "analytics + answer" --> GC["Groq chat<br/>llama-3.1 / 3.3"]
+    W -- "embed" --> OL["Ollama<br/>nomic-embed-text"]
+    W --> PG
+    OL --> QD
 ```
 
 End-to-end flow:
 
-```text
-upload audio
-  → validate + normalize (ffprobe / ffmpeg)
-  → ASR (Groq Whisper)
-  → diarization (pyannote)
-  → alignment + segment repair
-  → speaker label resolution (rules → LLM fallback)
-  → transcript exports (json / txt / srt / md)
-  → analytics extraction (action items, decisions, topics)
-  → markdown indexing (Ollama embeddings → Qdrant)
-  → cross-meeting query (RRF fusion → grounded answer + citations)
+```mermaid
+flowchart TD
+    A[upload audio] --> B[validate + normalize<br/>ffprobe / ffmpeg]
+    B --> C[ASR — Groq Whisper]
+    C --> D[diarization — pyannote]
+    D --> E[alignment + segment repair]
+    E --> F[speaker label resolution<br/>rules → LLM fallback]
+    F --> G[transcript exports<br/>json / txt / srt / md]
+    G --> H[analytics extraction<br/>action items · decisions · topics]
+    H --> I[markdown indexing<br/>Ollama embeddings → Qdrant]
+    I --> J[cross-meeting query<br/>RRF fusion → grounded answer + citations]
 ```
+
+A rendered copy of these diagrams (Mermaid source) lives in [`assets/architecture.md`](assets/architecture.md).
 
 ---
 
