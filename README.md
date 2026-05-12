@@ -1,6 +1,6 @@
 # Echolog — Audio Meeting Intelligence
 
-[![Echolog CI](https://github.com/k-arvanitis/recall-mie/actions/workflows/ci.yml/badge.svg)](https://github.com/k-arvanitis/recall-mie/actions/workflows/ci.yml)
+[![Echolog CI](https://github.com/k-arvanitis/echolog/actions/workflows/ci.yml/badge.svg)](https://github.com/k-arvanitis/echolog/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=next.js&logoColor=white)
@@ -209,7 +209,7 @@ Or run manually:
 
 ```bash
 # 1. clone + install Python deps
-git clone https://github.com/k-arvanitis/recall-mie.git && cd recall-mie
+git clone https://github.com/k-arvanitis/echolog.git && cd echolog
 uv sync --extra dev
 
 # 2. install frontend deps
@@ -293,7 +293,7 @@ See `.env.example` for the full list with safe placeholder values.
 ## Project Structure
 
 ```text
-recall-mie/
+echolog/
 ├── src/meeting_intelligence_engine/
 │   ├── api/                   # FastAPI: main.py (app factory + lifespan + error handler),
 │   │                          #   routes/ (meetings, query, privacy, system),
