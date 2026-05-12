@@ -25,20 +25,17 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const colorMap: Record<Toast["type"], string> = {
-    error: "bg-red-900 border-red-700 text-red-100",
-    info: "bg-zinc-800 border-zinc-600 text-zinc-100",
-    success: "bg-green-900 border-green-700 text-green-100",
+    error: "border-red-200 bg-red-50 text-red-800",
+    info: "border-ink-200 bg-surface text-ink-800",
+    success: "border-emerald-200 bg-emerald-50 text-emerald-700",
   };
 
   return (
     <ToastContext.Provider value={{ addToast }}>
       {children}
-      <div className="fixed top-4 right-4 z-50 flex flex-col gap-2 w-80">
+      <div className="fixed right-4 top-4 z-50 flex w-80 flex-col gap-2">
         {toasts.map((t) => (
-          <div
-            key={t.id}
-            className={`px-4 py-3 rounded border text-sm shadow-lg transition-all ${colorMap[t.type]}`}
-          >
+          <div key={t.id} className={`rounded-md border px-3 py-2 text-sm ${colorMap[t.type]}`}>
             {t.message}
           </div>
         ))}

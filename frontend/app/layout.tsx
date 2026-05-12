@@ -13,10 +13,15 @@ export const metadata: Metadata = {
   title: "Recall — Meeting Intelligence",
 };
 
+const themeInit = `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
-      <body className={`${geist.variable} font-sans bg-[#0a0a0a] text-zinc-100 antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInit }} />
+      </head>
+      <body className={`${geist.variable} font-sans antialiased`}>
         <ToastProvider>{children}</ToastProvider>
       </body>
     </html>

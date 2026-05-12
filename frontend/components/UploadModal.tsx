@@ -15,7 +15,7 @@ type Phase = "idle" | "uploading" | "processing" | "ready" | "failed";
 
 function Spinner() {
   return (
-    <svg className="animate-spin h-4 w-4 text-zinc-400" fill="none" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 animate-spin text-ink-400" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
     </svg>
@@ -91,79 +91,80 @@ export default function UploadModal({ onClose, onUploaded, onMeetingUpdated }: P
   const canUpload = !!file && title.trim().length > 0 && !busy && phase !== "ready";
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60">
-      <div className="bg-zinc-900 border border-zinc-700 rounded-lg w-[480px] p-6 shadow-2xl">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-base font-semibold text-zinc-100">Upload Meeting</h2>
-          <button onClick={onClose} className="text-zinc-500 hover:text-zinc-200 text-lg leading-none">✕</button>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-900/40">
+      <div className="w-[480px] rounded-lg border border-ink-200 bg-surface p-5">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-sm font-semibold text-ink-800">Upload meeting</h2>
+          <button onClick={onClose} className="text-lg leading-none text-ink-400 hover:text-ink-700">
+            ✕
+          </button>
         </div>
 
         <div
           onDrop={onDrop}
-          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragOver={(e) => {
+            e.preventDefault();
+            setDragging(true);
+          }}
           onDragLeave={() => setDragging(false)}
           onClick={() => inputRef.current?.click()}
-          className={`border-2 border-dashed rounded-lg p-8 text-center cursor-pointer transition-colors mb-4 ${
-            dragging ? "border-zinc-400 bg-zinc-800" : "border-zinc-700 hover:border-zinc-500"
+          className={`mb-4 cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-colors ${
+            dragging ? "border-brand bg-ink-100" : "border-ink-200 hover:border-ink-300"
           }`}
         >
-          <input
-            ref={inputRef}
-            type="file"
-            accept={ACCEPTED_EXT}
-            className="hidden"
-            onChange={onFileChange}
-          />
+          <input ref={inputRef} type="file" accept={ACCEPTED_EXT} className="hidden" onChange={onFileChange} />
           {file ? (
             <div>
-              <p className="text-sm font-medium text-zinc-100">{file.name}</p>
-              <p className="text-xs text-zinc-500 mt-1">{(file.size / 1_048_576).toFixed(1)} MB</p>
+              <p className="text-sm font-medium text-ink-800">{file.name}</p>
+              <p className="mt-1 text-[11px] text-ink-400">{(file.size / 1_048_576).toFixed(1)} MB</p>
             </div>
           ) : (
             <div>
-              <p className="text-sm text-zinc-400">Drag & drop or click to browse</p>
-              <p className="text-xs text-zinc-600 mt-1">mp3, mp4, wav, m4a, ogg</p>
+              <p className="text-sm text-ink-600">Drag &amp; drop or click to browse</p>
+              <p className="mt-1 text-[11px] text-ink-400">mp3, mp4, wav, m4a, ogg</p>
             </div>
           )}
         </div>
 
         <div className="mb-4">
-          <label className="block text-xs font-medium text-zinc-400 mb-1">Title</label>
+          <label className="mb-1 block text-[11px] font-medium text-ink-500">Title</label>
           <input
             type="text"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder="Meeting title"
-            className="w-full bg-zinc-800 border border-zinc-700 rounded px-3 py-2 text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none focus:border-zinc-500"
+            className="w-full rounded-md border border-ink-200 bg-ink-50 px-3 py-2 text-sm text-ink-800 placeholder-ink-400 focus:border-brand focus:outline-none"
           />
         </div>
 
         {error && (
-          <p className="text-xs text-red-400 mb-3">{error}</p>
+          <div className="mb-3 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-800">{error}</div>
         )}
 
         {phase === "processing" && (
-          <div className="flex items-center gap-2 text-xs text-yellow-400 mb-3">
+          <div className="mb-3 flex items-center gap-2 rounded-md border border-amber-200 bg-amber-50 px-3 py-2 text-xs text-amber-800">
             <Spinner />
             <span>Processing audio — this may take a few minutes…</span>
           </div>
         )}
 
         {phase === "ready" && (
-          <p className="text-xs text-green-400 mb-3">Meeting is ready!</p>
+          <div className="mb-3 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-xs text-emerald-700">
+            Meeting is ready!
+          </div>
         )}
 
         <div className="flex justify-end gap-2">
           <button
             onClick={onClose}
-            className="px-4 py-2 text-sm rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition-colors"
+            className="rounded-md border border-ink-200 bg-surface px-3 py-1.5 text-xs text-ink-700 hover:bg-ink-100"
           >
             Cancel
           </button>
           <button
             onClick={startUpload}
             disabled={!canUpload}
-            className="px-4 py-2 text-sm rounded bg-zinc-200 hover:bg-white text-zinc-900 font-medium transition-colors disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+            className="flex items-center gap-2 rounded-md bg-brand px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-brand-dark disabled:cursor-not-allowed disabled:opacity-40"
           >
             {busy && <Spinner />}
             {phaseLabel[phase]}

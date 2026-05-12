@@ -4,33 +4,21 @@
 
 @layer base {
   :root {
-    --background: #0a0a0a;
-    --foreground: #f4f4f5;
-    --card: #18181b;
-    --card-foreground: #f4f4f5;
-    --popover: #18181b;
-    --popover-foreground: #f4f4f5;
-    --primary: #e4e4e7;
-    --primary-foreground: #18181b;
-    --secondary: #27272a;
-    --secondary-foreground: #f4f4f5;
-    --muted: #27272a;
-    --muted-foreground: #a1a1aa;
-    --accent: #27272a;
-    --accent-foreground: #f4f4f5;
-    --destructive: #dc2626;
-    --border: #3f3f46;
-    --input: #3f3f46;
-    --ring: #71717a;
-    --radius: 0.5rem;
+    color-scheme: light;
+    --ink-50: 248 250 252; --ink-100: 241 245 249; --ink-200: 226 232 240; --ink-300: 203 213 225;
+    --ink-400: 148 163 184; --ink-500: 100 116 139; --ink-600: 71 85 105; --ink-700: 51 65 85;
+    --ink-800: 30 41 59; --ink-900: 15 23 42; --surface: 255 255 255; --brand-strong: 21 94 117;
   }
 
-  * {
-    border-color: var(--border);
+  .dark {
+    color-scheme: dark;
+    --ink-50: 15 23 42; --ink-100: 30 41 59; --ink-200: 51 65 85; --ink-300: 71 85 105;
+    --ink-400: 100 116 139; --ink-500: 148 163 184; --ink-600: 203 213 225; --ink-700: 226 232 240;
+    --ink-800: 241 245 249; --ink-900: 248 250 252; --surface: 30 41 59; --brand-strong: 103 232 249;
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: rgb(var(--ink-50));
+    color: rgb(var(--ink-900));
   }
 }

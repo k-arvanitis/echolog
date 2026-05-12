@@ -6,7 +6,7 @@ import { useToast } from "@/lib/toast";
 
 function Spinner() {
   return (
-    <svg className="animate-spin h-4 w-4 text-zinc-500" fill="none" viewBox="0 0 24 24">
+    <svg className="h-4 w-4 animate-spin text-ink-400" fill="none" viewBox="0 0 24 24">
       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
     </svg>
@@ -30,11 +30,7 @@ export default function OverviewTab({ meetingId }: Props) {
 
   useEffect(() => {
     setLoading(true);
-    Promise.all([
-      api.getActionItems(meetingId),
-      api.getDecisions(meetingId),
-      api.getTopics(meetingId),
-    ])
+    Promise.all([api.getActionItems(meetingId), api.getDecisions(meetingId), api.getTopics(meetingId)])
       .then(([a, d, t]) => {
         setActionItems(a);
         setDecisions(d);
@@ -46,7 +42,7 @@ export default function OverviewTab({ meetingId }: Props) {
 
   if (loading) {
     return (
-      <div className="flex items-center gap-2 px-6 py-8 text-zinc-500 text-sm">
+      <div className="flex items-center gap-2 px-6 py-8 text-sm text-ink-400">
         <Spinner /> Loading…
       </div>
     );
@@ -56,75 +52,80 @@ export default function OverviewTab({ meetingId }: Props) {
     ref.current?.scrollIntoView({ behavior: "smooth", block: "start" });
 
   return (
-    <div className="px-6 py-6 space-y-8">
-      <div className="grid grid-cols-3 gap-4">
+    <div className="space-y-3 p-3">
+      <div className="grid grid-cols-3 gap-3">
         {[
-          { label: "Action Items", count: actionItems.length, ref: actionRef },
+          { label: "Action items", count: actionItems.length, ref: actionRef },
           { label: "Decisions", count: decisions.length, ref: decisionRef },
           { label: "Topics", count: topics.length, ref: topicRef },
         ].map(({ label, count, ref }) => (
           <button
             key={label}
             onClick={() => scroll(ref)}
-            className="bg-zinc-900 border border-zinc-700 rounded-lg p-4 text-left hover:border-zinc-500 transition-colors"
+            className="rounded-lg border border-ink-200 bg-surface p-3 text-left transition-colors hover:bg-ink-100"
           >
-            <p className="text-2xl font-bold text-zinc-100">{count}</p>
-            <p className="text-xs text-zinc-500 mt-0.5">{label}</p>
+            <p className="text-2xl font-bold text-ink-800">{count}</p>
+            <p className="mt-0.5 text-[11px] text-ink-500">{label}</p>
           </button>
         ))}
       </div>
 
-      <div ref={actionRef}>
-        <h3 className="text-sm font-semibold text-zinc-300 mb-3">Action Items</h3>
-        {actionItems.length === 0 ? (
-          <p className="text-xs text-zinc-600">None identified.</p>
-        ) : (
-          <div className="space-y-2">
-            {actionItems.map((item, i) => (
-              <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3">
-                <p className="text-sm text-zinc-200">{item.text}</p>
-                <div className="flex items-center gap-3 mt-1.5 text-xs text-zinc-500">
+      <div ref={actionRef} className="rounded-lg border border-ink-200 bg-surface">
+        <div className="border-b border-ink-100 px-3 py-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Action items</p>
+        </div>
+        <div className="space-y-1.5 p-3">
+          {actionItems.length === 0 ? (
+            <p className="text-xs text-ink-400">None identified.</p>
+          ) : (
+            actionItems.map((item, i) => (
+              <div key={i} className="rounded-md border border-ink-100 p-2.5 text-xs">
+                <p className="text-ink-800">{item.text}</p>
+                <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-[11px] text-ink-500">
                   {item.assignee && <span>👤 {item.assignee}</span>}
                   {item.due_date && <span>📅 {item.due_date}</span>}
                 </div>
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
 
-      <div ref={decisionRef}>
-        <h3 className="text-sm font-semibold text-zinc-300 mb-3">Decisions</h3>
-        {decisions.length === 0 ? (
-          <p className="text-xs text-zinc-600">None identified.</p>
-        ) : (
-          <div className="space-y-2">
-            {decisions.map((d, i) => (
-              <div key={i} className="bg-zinc-900 border border-zinc-800 rounded-lg px-4 py-3">
-                <p className="text-sm text-zinc-200">{d.text}</p>
-                {d.context && <p className="text-xs text-zinc-500 mt-1.5">{d.context}</p>}
+      <div ref={decisionRef} className="rounded-lg border border-ink-200 bg-surface">
+        <div className="border-b border-ink-100 px-3 py-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Decisions</p>
+        </div>
+        <div className="space-y-1.5 p-3">
+          {decisions.length === 0 ? (
+            <p className="text-xs text-ink-400">None identified.</p>
+          ) : (
+            decisions.map((d, i) => (
+              <div key={i} className="rounded-md border border-ink-100 p-2.5 text-xs">
+                <p className="text-ink-800">{d.text}</p>
+                {d.context && <p className="mt-1 text-[11px] text-ink-500">{d.context}</p>}
               </div>
-            ))}
-          </div>
-        )}
+            ))
+          )}
+        </div>
       </div>
 
-      <div ref={topicRef}>
-        <h3 className="text-sm font-semibold text-zinc-300 mb-3">Topics</h3>
-        {topics.length === 0 ? (
-          <p className="text-xs text-zinc-600">None identified.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {topics.map((t, i) => (
-              <span
-                key={i}
-                className="px-3 py-1 rounded-full bg-zinc-800 border border-zinc-700 text-xs text-zinc-300"
-              >
-                {t.name}
-              </span>
-            ))}
-          </div>
-        )}
+      <div ref={topicRef} className="rounded-lg border border-ink-200 bg-surface">
+        <div className="border-b border-ink-100 px-3 py-2">
+          <p className="text-xs font-semibold uppercase tracking-wide text-ink-500">Topics</p>
+        </div>
+        <div className="p-3">
+          {topics.length === 0 ? (
+            <p className="text-xs text-ink-400">None identified.</p>
+          ) : (
+            <div className="flex flex-wrap gap-1.5">
+              {topics.map((t, i) => (
+                <span key={i} className="rounded bg-ink-100 px-1.5 py-0.5 text-[10px] text-ink-600">
+                  {t.name}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
