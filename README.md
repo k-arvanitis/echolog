@@ -1,6 +1,6 @@
-# Recall — Meeting Intelligence Engine
+# Echolog — Audio Meeting Intelligence
 
-[![CI](https://github.com/k-arvanitis/recall-mie/actions/workflows/ci.yml/badge.svg)](https://github.com/k-arvanitis/recall-mie/actions/workflows/ci.yml)
+[![Echolog CI](https://github.com/k-arvanitis/recall-mie/actions/workflows/ci.yml/badge.svg)](https://github.com/k-arvanitis/recall-mie/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=next.js&logoColor=white)
@@ -12,7 +12,8 @@
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![uv](https://img.shields.io/badge/uv-package%20manager-DE5FE9?style=for-the-badge)
 
-> Turn company meetings into a searchable memory layer.
+> Record once. Search forever.
+> Echolog turns meeting audio into a queryable knowledge base — speaker-attributed, cross-meeting, grounded in evidence.
 
 Upload meeting audio → get speaker-attributed transcripts, structured action items and decisions, and the ability to ask questions across **every meeting you've ever recorded**, not just one transcript at a time.
 
@@ -26,7 +27,17 @@ Per-meeting query exists as a drill-down. The primary value is the **shared meet
 
 ---
 
+**Who this is for:** Engineering teams, ops managers, and any organization running regular internal meetings that need institutional memory.
+
+**The problem it solves:** Critical decisions and action items get buried in hour-long recordings. Echolog processes meeting audio end-to-end — transcription, diarization, analytics extraction — and makes every meeting queryable so nothing gets lost.
+
+---
+
 ## Demo
+
+> 📹 **[Watch the demo](#)** — *(link coming soon)*
+>
+> Screenshots: see below *(coming soon)*
 
 Run `make stack` and open `http://localhost:3000` for the UI, or hit the
 interactive API docs at `http://localhost:8001/docs`. Screenshots live in
@@ -50,7 +61,7 @@ Example questions the app handles end to end:
 
 ## Why this is different
 
-Most meeting-intelligence demos stop at "transcribe one file and summarize it." Recall is built around the assumption that meeting value compounds over time:
+Most meeting-intelligence demos stop at "transcribe one file and summarize it." Echolog is built around the assumption that meeting value compounds over time:
 
 - **Cross-corpus retrieval is the primary surface**, not an afterthought. Hybrid (dense + BM25, fused with RRF) over transcript markdown.
 - **Grounded answers, not summaries.** The LLM is constrained to the retrieved transcript context with explicit `[Source N]` citations; it must say "I don't have information about that" when evidence is missing. This is enforced by prompt and validated by the eval harness (faithfulness 94%).
@@ -165,7 +176,7 @@ Run on a **50-question, 5-meeting** QA fixture in `eval/rag_qa/`, judged by `gpt
 | context precision | 78.2% |
 | context recall | 83.0% |
 
-The headline number is **faithfulness** — the system answers from retrieved evidence and refuses when it can't, instead of confidently inventing decisions or owners. The retrieval config is intentionally tuned toward cleaner evidence (better precision, slightly worse recall) because for a meeting-memory product, narrow correct retrieval beats noisy broad retrieval.
+> **Note on answer relevancy (74.3%):** Meeting transcripts are conversational and rarely follow clean question-answer structure. Queries that span multiple meetings return partial matches by design — Echolog is tuned to prefer narrow, correct retrieval over broad, noisy retrieval. Faithfulness (94%) is the primary quality signal: the system answers from retrieved evidence and refuses when it cannot, rather than hallucinating decisions or owners.
 
 All prompts live in `prompts.py` behind a `PROMPT_VERSION`; the eval output records it (and so do the runtime logs), so a quality number is always tied to the prompt that produced it. The committed results above are `PROMPT_VERSION = 2026-05-11`.
 
@@ -190,6 +201,13 @@ make eval-rag
 ## Quickstart
 
 ```bash
+# Fastest path — single command (requires Docker + .env configured)
+make demo
+```
+
+Or run manually:
+
+```bash
 # 1. clone + install Python deps
 git clone https://github.com/k-arvanitis/recall-mie.git && cd recall-mie
 uv sync --extra dev
@@ -206,10 +224,10 @@ ollama pull nomic-embed-text
 
 # 5. run worker, API, and frontend in a tmux session
 make stack
-tmux attach -t mie_stack
+tmux attach -t echolog
 ```
 
-Open `http://localhost:3000` for the Recall UI.
+Open `http://localhost:3000` for the Echolog UI.
 The FastAPI backend lives at `http://localhost:8001` (Swagger docs at `/docs`).
 
 ---
@@ -228,6 +246,10 @@ The FastAPI backend lives at `http://localhost:8001` (Swagger docs at `/docs`).
 | Hugging Face account | — | Accept `pyannote/speaker-diarization-3.1` gating; provide `HF_TOKEN` |
 | Groq API key | — | Whisper ASR + analytics + answer LLM |
 | OpenAI API key | — | RAG eval judge only (optional if you don't run eval) |
+
+> ⚠️ **Hugging Face gating required:** Before running Echolog, you must manually accept the model license at [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1).
+> This requires a HF account and can take a few minutes to be approved.
+> Without this step, the pipeline will fail with a 401 error on first run.
 
 ---
 

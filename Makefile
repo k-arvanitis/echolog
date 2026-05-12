@@ -1,9 +1,10 @@
 SHELL := /bin/bash
 
-.PHONY: help infra-up infra-down infra-logs api worker frontend stack test lint format docker-build eval-ami eval-rag clean-eval
+.PHONY: help demo infra-up infra-down infra-logs api worker frontend stack test lint format docker-build eval-ami eval-rag clean-eval
 
 help:
 	@echo "Targets:"
+	@echo "  make demo          # one command: infra + embedding model + worker/api/frontend"
 	@echo "  make infra-up      # start postgres, redis, qdrant"
 	@echo "  make infra-down    # stop docker services"
 	@echo "  make infra-logs    # tail docker service logs"
@@ -18,6 +19,23 @@ help:
 	@echo "  make eval-ami      # run full AMI WER eval (English forced)"
 	@echo "  make eval-rag      # run RAG QA eval over fixed question set"
 	@echo "  make clean-eval    # remove eval scratch (keeps published results)"
+
+demo: infra-up
+	ollama pull nomic-embed-text
+	@if command -v tmux >/dev/null 2>&1; then \
+		tmux has-session -t echolog 2>/dev/null && tmux kill-session -t echolog || true; \
+		tmux new-session -d -s echolog 'cd $(CURDIR) && uv run meeting-worker'; \
+		tmux split-window -t echolog 'cd $(CURDIR) && uv run meeting-api'; \
+		tmux split-window -t echolog 'cd $(CURDIR)/frontend && npm run dev'; \
+		tmux select-layout -t echolog tiled; \
+		echo "tmux session started: echolog (attach with: tmux attach -t echolog)"; \
+	else \
+		echo "tmux not found — run each service in its own terminal:"; \
+		echo "  uv run meeting-worker"; \
+		echo "  uv run meeting-api"; \
+		echo "  (cd frontend && npm run dev)"; \
+	fi
+	@echo "Open http://localhost:3000"
 
 infra-up:
 	docker compose up -d postgres redis qdrant
@@ -38,13 +56,13 @@ frontend:
 	cd frontend && npm run dev
 
 stack: infra-up
-	@tmux has-session -t mie_stack 2>/dev/null && tmux kill-session -t mie_stack || true
-	tmux new-session -d -s mie_stack 'cd $(CURDIR) && uv run meeting-worker'
-	tmux split-window -t mie_stack 'cd $(CURDIR) && uv run meeting-api'
-	tmux split-window -t mie_stack 'cd $(CURDIR)/frontend && npm run dev'
-	tmux select-layout -t mie_stack tiled
-	@echo "tmux session started: mie_stack"
-	@echo "attach with: tmux attach -t mie_stack"
+	@tmux has-session -t echolog 2>/dev/null && tmux kill-session -t echolog || true
+	tmux new-session -d -s echolog 'cd $(CURDIR) && uv run meeting-worker'
+	tmux split-window -t echolog 'cd $(CURDIR) && uv run meeting-api'
+	tmux split-window -t echolog 'cd $(CURDIR)/frontend && npm run dev'
+	tmux select-layout -t echolog tiled
+	@echo "tmux session started: echolog"
+	@echo "attach with: tmux attach -t echolog"
 
 test:
 	uv run --extra dev pytest
