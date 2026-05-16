@@ -1,6 +1,6 @@
 SHELL := /bin/bash
 
-.PHONY: help demo infra-up infra-down infra-logs api worker frontend stack test lint format docker-build eval-ami eval-rag clean-eval
+.PHONY: help demo infra-up infra-down infra-logs api worker ui stack test lint format docker-build eval-ami eval-rag clean-eval
 
 help:
 	@echo "Targets:"
@@ -10,7 +10,7 @@ help:
 	@echo "  make infra-logs    # tail docker service logs"
 	@echo "  make api           # run FastAPI app on :8001"
 	@echo "  make worker        # run Celery worker"
-	@echo "  make frontend      # run Next.js dev server on :3000"
+	@echo "  make ui            # run Next.js dev server on :3000"
 	@echo "  make stack         # start infra, worker, and api in tmux"
 	@echo "  make test          # run pytest"
 	@echo "  make lint          # run ruff check + ruff format --check"
@@ -52,7 +52,7 @@ api:
 worker:
 	uv run meeting-worker
 
-frontend:
+ui:
 	cd frontend && npm run dev
 
 stack: infra-up

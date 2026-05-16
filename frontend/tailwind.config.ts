@@ -18,8 +18,8 @@ const config: Config = {
         ),
         surface: "rgb(var(--surface) / <alpha-value>)",
         brand: {
-          DEFAULT: "#0e7490",
-          light: "#67e8f9",
+          DEFAULT: "#4338ca",
+          light: "#a5b4fc",
           dark: "rgb(var(--brand-strong) / <alpha-value>)",
         },
       },
