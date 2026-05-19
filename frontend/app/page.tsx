@@ -51,9 +51,9 @@ export default function Home() {
   return (
     <div className="flex h-screen flex-col bg-ink-50">
       <header className="flex flex-shrink-0 items-center justify-between border-b border-ink-200 bg-surface px-6 py-3">
-        <span className="text-xl font-bold tracking-tight text-ink-800">Recall</span>
+        <span className="text-xl font-bold tracking-tight text-ink-800">Echolog</span>
         <div className="flex items-center gap-3">
-          <span className="hidden text-[11px] text-ink-400 sm:inline">Meeting Intelligence Engine</span>
+          <span className="hidden text-[11px] text-ink-400 sm:inline">Audio Meeting Intelligence</span>
           <ThemeToggle />
         </div>
       </header>

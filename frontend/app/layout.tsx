@@ -10,7 +10,7 @@ const geist = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Recall — Meeting Intelligence",
+  title: "Echolog — Audio Meeting Intelligence",
 };
 
 const themeInit = `try{var t=localStorage.getItem('theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme:dark)').matches))document.documentElement.classList.add('dark')}catch(e){}`;
