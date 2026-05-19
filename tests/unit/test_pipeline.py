@@ -136,7 +136,11 @@ def test_sanitize_analytics_payload_coerces_sloppy_llm_types() -> None:
     assert result.topics[0].keywords == ["parking", "reimbursement"]
 
 
-def test_infer_speaker_labels_from_self_introduction() -> None:
+def test_infer_speaker_labels_from_self_introduction(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "meeting_intelligence_engine.services.speaker_labels._fallback_candidates_with_llm",
+        lambda *_args, **_kwargs: {},
+    )
     transcript = TranscriptResult(
         meeting_id=uuid4(),
         speakers=["SPEAKER_00", "SPEAKER_01"],
@@ -193,7 +197,11 @@ def test_apply_speaker_labels_drops_conflicting_truncated_intro_from_display() -
     assert transcript.segments[1].speaker_name is None
 
 
-def test_infer_speaker_labels_rejects_role_titles_as_names() -> None:
+def test_infer_speaker_labels_rejects_role_titles_as_names(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setattr(
+        "meeting_intelligence_engine.services.speaker_labels._fallback_candidates_with_llm",
+        lambda *_args, **_kwargs: {},
+    )
     transcript = TranscriptResult(
         meeting_id=uuid4(),
         speakers=["SPEAKER_02"],
