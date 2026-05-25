@@ -1,95 +1,82 @@
 # Echolog — Audio Meeting Intelligence
 
+**Echolog turns meeting audio into a queryable knowledge base** — speaker-attributed transcripts, structured action items and decisions, and grounded answers with citations across every meeting you've ever recorded. Measured: **94% faithfulness on a 50-question RAG eval; 25% raw WER on 30 AMI multi-speaker meetings; 0 failed transcriptions across the corpus**.
+
+Built for teams that record every meeting and want institutional memory — not one-off summaries. Echolog's primary surface is **cross-meeting retrieval**: ask a question, get a grounded answer drawn from your entire meeting history.
+
+**Who this is for:** Engineering teams, ops managers, and any organization running regular internal meetings that need durable, searchable institutional memory.
+
 [![Echolog CI](https://github.com/k-arvanitis/echolog/actions/workflows/ci.yml/badge.svg)](https://github.com/k-arvanitis/echolog/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
 ![FastAPI](https://img.shields.io/badge/FastAPI-009688?style=for-the-badge&logo=fastapi&logoColor=white)
 ![Next.js](https://img.shields.io/badge/Next.js%2014-000000?style=for-the-badge&logo=next.js&logoColor=white)
 ![Celery](https://img.shields.io/badge/Celery-37814A?style=for-the-badge&logo=celery&logoColor=white)
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)
-![Qdrant](https://img.shields.io/badge/Qdrant-FF4136?style=for-the-badge&logoColor=white)
+![Qdrant](https://img.shields.io/badge/Qdrant-DC244C?style=for-the-badge&logo=qdrant&logoColor=white)
 ![Groq](https://img.shields.io/badge/Groq-F55036?style=for-the-badge&logoColor=white)
 ![Ollama](https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
 ![uv](https://img.shields.io/badge/uv-package%20manager-DE5FE9?style=for-the-badge)
 
-> Record once. Search forever.
-> Echolog turns meeting audio into a queryable knowledge base — speaker-attributed, cross-meeting, grounded in evidence.
-
-Upload meeting audio → get speaker-attributed transcripts, structured action items and decisions, and the ability to ask questions across **every meeting you've ever recorded**, not just one transcript at a time.
-
-The product idea is intentionally narrow:
-
-- every meeting gets saved;
-- every meeting becomes queryable;
-- the company builds an internal memory of what was discussed, decided, assigned, and repeated.
-
-Per-meeting query exists as a drill-down. The primary value is the **shared meeting store** and cross-corpus retrieval.
-
----
-
-**Who this is for:** Engineering teams, ops managers, and any organization running regular internal meetings that need institutional memory.
-
-**The problem it solves:** Critical decisions and action items get buried in hour-long recordings. Echolog processes meeting audio end-to-end — transcription, diarization, analytics extraction — and makes every meeting queryable so nothing gets lost.
-
 ---
 
 ## Demo
 
-> 📹 **[Watch the demo](#)** — *(link coming soon)*
->
-> Screenshots: see below *(coming soon)*
+<!-- After pushing, drop assets/demo.mp4 into the GitHub README editor to get a https://github.com/user-attachments/assets/<uuid> URL and replace the line below. -->
 
-Run `make stack` and open `http://localhost:3000` for the UI, or hit the
-interactive API docs at `http://localhost:8001/docs`. Screenshots live in
-[`assets/`](assets/).
+<video src="https://github.com/k-arvanitis/echolog/raw/main/assets/demo.mp4" controls width="100%"></video>
 
-The app is a three-pane shell:
+> 60-second tour — upload, transcribe, browse analytics, ask grounded questions.
+> If the embed doesn't render, [download `assets/demo.mp4`](assets/demo.mp4) directly.
 
-- **Left**: meeting list with status badges (processing / ready / failed) and an upload button.
-- **Center**: tabbed meeting detail — Overview, Transcript, Analytics, Ask.
-- **Right**: persistent cross-meeting chat that searches the entire corpus.
-
-Example questions the app handles end to end:
-
-- "What did we decide about parking?"
-- "When did we first discuss the training issue?"
-- "Which meetings mentioned customer churn?"
-- "What action items were assigned to Jason in the last quarter?"
-- "Did we already agree on the rollout plan?"
+| Analytics — action items, decisions, topics | Ask — grounded answers with citations |
+|---|---|
+| ![Analytics tab](assets/analytics.png) | ![Ask tab](assets/ask.png) |
 
 ---
 
-## Why this is different
+**The problem.** Meetings contain the highest-value information in any organization — decisions made, owners assigned, blockers raised — but it's locked inside hour-long audio. Action items get lost in the recording. The same questions get re-asked weeks later. New hires can't catch up on the last three months of decisions. Existing meeting-intelligence tools stop at "transcribe one file and summarize it" — they don't accumulate.
 
-Most meeting-intelligence demos stop at "transcribe one file and summarize it." Echolog is built around the assumption that meeting value compounds over time:
+**What Echolog does.** Ingests meeting audio end-to-end: ASR (Groq Whisper), diarization (pyannote 3.1), segment repair, rule-based + LLM speaker naming, structured analytics extraction (action items, decisions, topics), and markdown indexing into Qdrant with hybrid (dense + BM25) retrieval. Every processed meeting joins a shared store you can query across.
 
-- **Cross-corpus retrieval is the primary surface**, not an afterthought. Hybrid (dense + BM25, fused with RRF) over transcript markdown.
-- **Grounded answers, not summaries.** The LLM is constrained to the retrieved transcript context with explicit `[Source N]` citations; it must say "I don't have information about that" when evidence is missing. This is enforced by prompt and validated by the eval harness (faithfulness 94%).
-- **Real evals on real meeting audio.** WER measured on 30/30 AMI Meeting Corpus mix-headset meetings; RAG metrics measured on a fixed 50-question, 5-meeting QA set with an LLM-as-judge (GPT-4.1-mini via RAGAS).
-- **Two-stage cleanup of diarization artifacts.** Rule-based segment repair fixes broken intros and split sentences before LLM speaker-naming runs as a fallback. Naming is conservative by design — it would rather leave `SPEAKER_03` than guess.
-- **Batch-first by design.** Long ASR / diarization / indexing runs sit in Celery workers behind the API; the UI polls until ready. The tradeoff is documented, not hidden.
-- **Swap-friendly ML interfaces.** ASR and diarization sit behind abstract interfaces in `core/interfaces.py` so they can be benchmarked and swapped without pipeline changes.
+**How you use it.** Drop in an mp3 → watch it process → browse the auto-extracted analytics → ask a question scoped to that meeting (drill-down) or across every meeting you've ever uploaded (the primary surface). Answers are grounded in retrieved transcript chunks with explicit `[Source N]` citations; the model refuses to answer when evidence is missing.
 
 ---
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    UI["Next.js UI<br/>:3000"] -- "HTTP / JSON" --> API["FastAPI<br/>:8001"]
-    API --> PG[("PostgreSQL<br/>meeting state")]
-    API --> RDS[("Redis<br/>Celery broker")]
-    API --> QD[("Qdrant<br/>hybrid retrieval")]
-    RDS --> W["Celery worker<br/>transcribe · analytics · indexing"]
-    W -- "ASR" --> GW["Groq Whisper"]
-    W -- "diarization" --> PY["pyannote"]
-    W -- "analytics + answer" --> GC["Groq chat<br/>llama-3.1 / 3.3"]
-    W -- "embed" --> OL["Ollama<br/>nomic-embed-text"]
-    W --> PG
-    OL --> QD
+```
+┌──────────────────────────┐                 ┌──────────────────────────────────┐
+│   Next.js 14 frontend    │                 │   FastAPI backend (uvicorn)      │
+│   (TypeScript + Tailwind)│                 │                                  │
+│                          │                 │  POST /meetings/upload           │
+│  Sidebar ────────────────┼── fetch + poll ─►  GET  /meetings/{id}             │
+│  MeetingDetail (tabs)    │                 │  POST /query        (cross)      │
+│  CrossMeetingPanel       │                 │  POST /meetings/{id}/query       │
+└──────────────────────────┘                 └──────────────┬───────────────────┘
+                                                            │
+                                       ┌────────────────────┴───────────────────┐
+                                       ▼                                        ▼
+                              ┌─────────────────┐                  ┌───────────────────────┐
+                              │  PostgreSQL     │                  │  Redis (Celery broker)│
+                              │  meeting state  │                  └──────────┬────────────┘
+                              │  transcripts    │                             │
+                              │  analytics      │                             ▼
+                              └─────────────────┘            ┌──────────────────────────────┐
+                                       ▲                     │   Celery worker              │
+                                       │                     │   transcribe · analytics ·   │
+                                       └─────────────────────┤   indexing                   │
+                                                             └──────────────┬───────────────┘
+                                                                            │
+                              ┌────────────────────┬───────────────────┬────┴──────────────┐
+                              ▼                    ▼                   ▼                   ▼
+                       ┌────────────┐      ┌────────────┐      ┌─────────────┐    ┌─────────────────┐
+                       │ Groq       │      │ pyannote   │      │ Groq chat   │    │ Ollama embed +  │
+                       │ Whisper    │      │ diarization│      │ llama-3.1/3 │    │ Qdrant (hybrid) │
+                       └────────────┘      └────────────┘      └─────────────┘    └─────────────────┘
 ```
 
-End-to-end flow:
+End-to-end pipeline (Mermaid for GitHub renderers):
 
 ```mermaid
 flowchart TD
@@ -104,152 +91,160 @@ flowchart TD
     I --> J[cross-meeting query<br/>RRF fusion → grounded answer + citations]
 ```
 
-A rendered copy of these diagrams (Mermaid source) lives in [`assets/architecture.md`](assets/architecture.md).
+The pipeline runs as Celery tasks behind the API; the frontend polls until the meeting's status flips to `ready`. The same retrieval layer serves both per-meeting (drill-down) and cross-meeting (primary) queries — the only difference is a Qdrant payload filter.
 
 ---
 
 ## Key Engineering Decisions
 
-| Decision | Options considered | Choice | Why / tradeoff |
-|---|---|---|---|
-| **Retrieval strategy** | Pure dense, pure BM25, dense + sparse with RRF, agentic RAG | Dense (`nomic-embed-text`) + sparse (Qdrant BM25) fused with RRF, single retrieve-then-answer step | Corpus is narrow and uniform (transcript markdown). RRF gives the lexical recall of BM25 + the semantic recall of dense without weight tuning. Skipped agentic RAG: no tool use needed, easier to evaluate, harder to hide reasoning errors behind agent loops. |
-| **Chunking** | Fixed-size, sentence, semantic, speaker-turn aware | Markdown-section chunks tagged with speakers and time spans | Inspectable in raw form, preserves turn boundaries that the LLM uses to attribute citations. Tradeoff: chunks vary in length, occasionally truncating long discussions. |
-| **Speaker attribution** | LLM-only naming, rules-only naming, hybrid | Rules first (deterministic self-introduction parsing), LLM fallback only for unresolved speakers | Conservative naming: prefers `SPEAKER_03` over a wrong guess. The product fails worse if it puts a real name on the wrong speaker than if it leaves an anonymous label. |
-| **Segment repair** | Trust diarizer output, learned correction, rule-based heuristics | Rule-based heuristics for two specific failure modes (broken intros, leading-fragment misattribution) | Cheap, predictable, easy to inspect. Doesn't generalize as broadly as a learned model would, but the failure modes it targets are the most common ones in our eval. |
-| **Async vs sync pipeline** | Sync API, async with Celery, streaming with WebSockets | Celery + Redis with frontend polling | ASR + diarization + analytics on a 30-minute meeting takes minutes, not milliseconds. Sync would lock the API; streaming adds complexity for no UX win at this scale. |
-| **Frontend** | Server-rendered FastAPI templates, single-page Next.js, separate React app behind FastAPI | Next.js 14 App Router, talking to FastAPI over CORS | Cleaner separation between pipeline (Python) and UX (TypeScript). Lets the API stay JSON-only and headless. The original FastAPI static UI is still served at `/` for backend-only smoke testing. |
-| **Status enum mapping** | Mirror backend states in UI, collapse to UI-friendly states | Backend keeps `pending/processing/completed/failed`, frontend collapses to `processing/ready/failed` | Backend states are useful for debugging (`pending` ≠ `processing`) but the UI only needs three: still working, done, broken. |
-| **Privacy controls** | None / opt-in / always-on | Optional retention deadlines, optional raw-audio purge after processing | Audio is the most sensitive artifact; transcripts are derived. Lets the operator delete raw audio while keeping searchable text. |
+**Cross-corpus retrieval as the primary surface — not per-meeting summary.** Most meeting-intelligence demos stop at transcribing and summarizing a single file. Echolog assumes meeting value compounds over time: every processed meeting goes into one shared store, and `POST /query` searches all of them via hybrid (dense + BM25, fused with RRF) retrieval. Per-meeting queries exist as drill-downs but are the secondary mode — the right-pane chat in the UI is always cross-corpus.
+
+**Grounded answers with refusal — not summarization.** The RAG prompt (`prompts.RAG_ANSWER_SYSTEM`) is constrained to retrieved transcript context only, must produce `[Source N]` inline citations, and must respond *"I don't have information about that"* when evidence is absent. Enforced in the prompt and measured by the eval harness: faithfulness 94%. The LLM never hallucinates an owner or a decision the transcripts don't support.
+
+**Conservative speaker naming.** Rule-based pass first (deterministic self-introduction parsing: "Hi, I'm Alice"), LLM fallback only for unresolved speakers with explicit text evidence. Names are validated against a stopword + word-shape filter (1–3 alphabetic tokens, uppercase-first, no common English words) and deduplicated — if the LLM assigns the same name to multiple speaker IDs, all are dropped. The product fails worse if it puts a real name on the wrong speaker than if it leaves `SPEAKER_03`.
+
+**Speaker-turn-aware chunking with paragraph snapping.** Markdown transcripts have each speaker turn as its own paragraph. The chunker splits on `\n\n` boundaries, and after overlap, chunk starts snap forward to the next paragraph or sentence break — so retrieved sources displayed in the citations panel never start mid-word or mid-sentence. Visible UX win when the user expands "Show 5 sources" on an answer.
+
+**Two-stage cleanup of diarization artifacts.** Rule-based segment repair (`services/segment_repairs.py`) fixes broken intros and leading-fragment misattribution before LLM speaker-naming runs. The repair rules target the two most common pyannote failure modes documented in the eval — cheap, predictable, easy to inspect. Doesn't generalize as broadly as a learned correction layer would, but the failure modes it covers are the most common.
+
+**Batch-first with Celery + polling.** ASR + diarization + analytics on a 30-minute meeting take minutes, not milliseconds. Sync would lock the API; WebSocket streaming adds complexity for no UX win at this scale. The frontend polls every 3 s during processing and 30 s for the meetings list. The tradeoff is documented, not hidden.
+
+**Swap-friendly ML interfaces.** ASR and diarization sit behind abstract interfaces in `core/interfaces.py` so they can be benchmarked and swapped without pipeline changes. The current concrete implementations (Groq Whisper, pyannote 3.1) are one of several plausible combinations — the eval harness is the contract.
+
+---
+
+## Design Decisions
+
+**Hybrid retrieval (RRF) over pure dense.** Transcript markdown contains exact terms — names, ticket IDs, project codenames, jargon — that dense-only search misses under paraphrase. BM25 handles keyword precision; the dense model handles intent. Qdrant runs both in a single prefetch query with built-in RRF fusion — no learned weighting required, no manual reranking step.
+
+**Local embeddings (Ollama `nomic-embed-text`) over a hosted API.** No PII leaves the machine, no per-token cost, no rate limit during indexing. Slower than hosted (~100 ms per embed vs. ~20 ms), but the indexing pipeline runs in a Celery worker and the latency is hidden behind status polling.
+
+**Markdown as the canonical transcript format.** `.md` files are inspectable in any editor, diff cleanly in git, and preserve speaker turns as natural paragraph boundaries. The chunker leverages those boundaries directly — no custom parser required. JSON, SRT, and TXT exports are derived from the same canonical state, so they can never disagree.
+
+**Custom name validator over trusting the LLM.** The speaker-naming LLM occasionally hallucinates assignees from transcript phrases ("Going To Update", "In Line"). A post-processing validator (`speaker_labels._looks_like_person_name`) enforces: 1–3 tokens, alphabetic + uppercase-first, no common English stopwords / modals / fillers. The same validator is reused to scrub action-item assignees and decision stakeholders. Belt and suspenders against LLM drift.
+
+**Celery + Postgres over an in-process job queue.** Persisted job state means a worker crash mid-meeting doesn't lose the upload — a fresh worker resumes from the database checkpoint. One extra dependency (Redis) for a property the API would otherwise have to fake.
+
+**Next.js 14 over server-rendered FastAPI templates.** Cleaner separation between the Python pipeline and the TypeScript UX. The API stays JSON-only and headless. The original FastAPI static UI is still served at `/` as a backend-only smoke test (so the pipeline can be exercised without the frontend running at all).
 
 ---
 
 ## Tech Stack
 
-| Component | Technology | Why |
+| Component | Technology | Why, not the alternative |
 |---|---|---|
-| API | FastAPI + Pydantic | Typed JSON APIs, async-friendly, painless file upload. |
-| Frontend | Next.js 14 (App Router), Tailwind CSS, TypeScript | Standard modern frontend stack, three-pane shell with no router needed. |
-| Background jobs | Celery + Redis | Long-running ASR / indexing should not block the API. |
-| Relational store | PostgreSQL 16 | Durable meeting metadata, transcripts, analytics, job state. |
-| Vector store | Qdrant 1.17 | Hybrid (dense + sparse) retrieval with RRF fusion built in. Easy local deploy. |
-| Embeddings | Ollama `nomic-embed-text` (768-dim) | Fully local dense embeddings. Tradeoff: slower than hosted, but no PII leaves the machine. |
-| ASR | Groq `whisper-large-v3` | Strong Whisper baseline, no local serving burden. Tradeoff: less decoding control than a local WhisperX stack. |
-| Diarization | `pyannote/speaker-diarization-3.1` | Strong open diarization baseline. Tradeoff: HF gating, GPU dependency. |
-| Analytics + answer generation | Groq `llama-3.1-8b-instant` (analytics), `llama-3.3-70b-versatile` (answer) | Fast, structured-JSON friendly, cheap to iterate on prompts. |
-| Eval judge | OpenAI `gpt-4.1-mini` via RAGAS | Independent judge for faithfulness / context precision / context recall / answer relevancy. |
-| Package manager | `uv` | Fast, reproducible Python installs; `uv.lock` checked in. |
+| ASR | Groq `whisper-large-v3` | Over local WhisperX: hosted inference is 10× faster for batch use with no GPU dependency. Less decoding control, but AMI eval shows the quality is acceptable (25% raw WER on multi-speaker mix-headset audio) |
+| Diarization | `pyannote/speaker-diarization-3.1` | Over WhisperX's built-in diarization: pyannote 3.1 is the strongest open baseline on AMI. Trade is HF license gating + GPU dependency for this single stage |
+| Vector store | Qdrant 1.17 | Over pgvector: Qdrant runs dense + sparse in a single prefetch query with built-in RRF fusion; pgvector requires two separate queries and manual reranking. Over Chroma: no native BM25 support |
+| Dense embeddings | Ollama `nomic-embed-text` (768-dim) | Over hosted (OpenAI ada-002, Cohere): no PII leaves the machine, no per-token cost, no quota during eval reruns. ~100 ms per embed vs. ~20 ms hosted — hidden behind the indexing worker |
+| Sparse encoder | Qdrant `bm25` | Required for hybrid: transcripts contain exact terms (names, IDs, jargon) dense search misses under paraphrase |
+| Analytics LLM | Groq `llama-3.1-8b-instant` | Over a 70B model for structured extraction: 8B is fast enough to iterate prompts, and bounded JSON extraction doesn't need 70B-class reasoning |
+| Answer LLM | Groq `llama-3.3-70b-versatile` | Over the 8B: synthesizing a grounded answer across 5 retrieved chunks needs the larger model. Eval shows the quality delta is real |
+| Eval judge | OpenAI `gpt-4.1-mini` via RAGAS | Over self-judge with the answer model: independent judge prevents the system from grading its own work |
+| API | FastAPI + Pydantic | Typed JSON, async-friendly, painless multipart upload |
+| Background jobs | Celery + Redis | Over in-process queue: persisted job state survives worker restarts mid-meeting |
+| Relational store | PostgreSQL 16 | Durable meeting metadata, transcripts, analytics, job state |
+| Frontend | Next.js 14 + Tailwind | Over single-file React app: file-based routing is overkill here but dev ergonomics + Tailwind v3 design tokens are worth it |
+| Package manager | `uv` | Over pip: 10× faster installs, lockfile-first, integrated venv management |
 
 ---
 
-## Evaluation
+## Two Query Modes
 
-### ASR — AMI Meeting Corpus (Mix-Headset)
+### `POST /query` — cross-meeting (primary surface)
 
-Run on **30 / 30** meetings in the AMI mix-headset configuration — multi-speaker, overlap, interruptions, conversational speech. This is the closest open benchmark to the product's real input shape.
-
-| Metric | Result |
-|---|---|
-| mean raw WER | **24.99%** |
-| mean filler-light WER | **20.65%** |
-| failed meetings | **0 / 30** |
-| best meeting (`ES2016b`) | 19.22% raw WER, 15.20% filler-light |
-| worst meeting (`ES2005a`) | 35.34% raw WER, 31.32% filler-light |
-
-`filler-light WER` strips obvious fillers (`uh`, `um`, `mm`) and immediate duplicates before scoring. Reported as a secondary metric because filler-heavy manual annotations of conversational speech inflate raw WER without reflecting downstream usability.
-
-These numbers are higher than clean single-speaker benchmarks because **this is mixed multi-speaker audio**, not isolated headset speech. Even at 25% raw WER, the resulting transcripts preserve enough signal for retrieval, action extraction, and cross-meeting search — which is what the eval harness measures next.
-
-Run it:
+Hybrid retrieval over the entire meeting store, restricted by nothing. The right-pane chat in the UI. Answers are grounded in chunks drawn from any subset of meetings.
 
 ```bash
-make eval-ami
+curl -X POST http://127.0.0.1:8001/query \
+  -H "Content-Type: application/json" \
+  -d '{"query":"What did we decide about performance issues last quarter?","top_k":5}'
 ```
 
-### RAG — fixed QA set, RAGAS judge
+### `POST /meetings/{id}/query` — single-meeting (drill-down)
 
-Run on a **50-question, 5-meeting** QA fixture in `eval/rag_qa/`, judged by `gpt-4.1-mini` via RAGAS.
+Same pipeline, Qdrant payload filter restricts retrieval to one meeting. Used by the Ask tab on a meeting detail page for focused review.
 
-| Metric | Score |
-|---|---|
-| faithfulness | **94.0%** |
-| answer relevancy | 74.3% |
-| context precision | 78.2% |
-| context recall | 83.0% |
+Both modes return the same shape: `{"answer", "sources": [{meeting_title, content, score, speakers, start_time, end_time}], "processing_time_ms"}`.
 
-> **Note on answer relevancy (74.3%):** Meeting transcripts are conversational and rarely follow clean question-answer structure. Queries that span multiple meetings return partial matches by design — Echolog is tuned to prefer narrow, correct retrieval over broad, noisy retrieval. Faithfulness (94%) is the primary quality signal: the system answers from retrieved evidence and refuses when it cannot, rather than hallucinating decisions or owners.
-
-All prompts live in `prompts.py` behind a `PROMPT_VERSION`; the eval output records it (and so do the runtime logs), so a quality number is always tied to the prompt that produced it. The committed results above are `PROMPT_VERSION = 2026-05-11`.
-
-Run it:
-
-```bash
-make eval-rag
-```
+The value compounds the more meetings you store: cross-meeting retrieval has more context to fuse, and the same query that returns nothing useful from one meeting returns a real answer once five related meetings exist.
 
 ---
 
 ## Privacy & Data
 
-- All raw audio is processed locally; only ASR (Groq) and analytics/answer generation (Groq) are hosted services. Transcripts and embeddings stay on the machine.
-- Embeddings are computed by **local** Ollama; vectors and full transcript text live in the local Qdrant instance.
-- Retention is configurable: `MIE_DEFAULT_RETENTION_DAYS=90` (default). `POST /privacy/cleanup-expired` deletes meetings past their retention deadline.
+- All audio processing is local. Only ASR (Groq) and analytics + answer generation (Groq) hit hosted services. Transcripts and embeddings stay on the machine.
+- Embeddings run on local Ollama; vectors and full transcript text live in the local Qdrant instance.
+- Retention is configurable: `MIE_DEFAULT_RETENTION_DAYS=90` (default). `POST /privacy/cleanup-expired` deletes meetings past their deadline.
 - Raw audio can be purged after processing via `POST /meetings/{id}/privacy/purge-raw-audio` while keeping transcripts and analytics.
-- This repo is a strong engineering prototype, not a fully compliant enterprise deployment. Auth, encryption-at-rest, audit logging, and consent capture are explicitly out of scope for this version (see [Out of Scope](#out-of-scope)).
+- This repo is a runnable prototype, not a fully compliant enterprise deployment. Auth, encryption-at-rest, audit logging, and consent capture are explicitly out of scope for this version — see [Known Limitations](#known-limitations).
 
 ---
 
-## Quickstart
+## Setup
 
+### Prerequisites
+- Python 3.12, [`uv`](https://docs.astral.sh/uv/)
+- Node.js ≥ 18, `npm`
+- Docker + Docker Compose (Postgres / Redis / Qdrant)
+- `ffmpeg` + `ffprobe` (audio normalization)
+- Ollama (local dense embeddings)
+- Hugging Face account — accept `pyannote/speaker-diarization-3.1` gating; provide `HF_TOKEN`
+- Groq API key (Whisper ASR + analytics + answer LLM)
+- OpenAI API key (RAG eval judge only — optional if you don't run eval)
+
+> ⚠️ **Hugging Face gating required.** Accept the model license at [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1) before the first run. Without this, the pipeline fails with a 401.
+
+### Install
 ```bash
-# Fastest path — single command (requires Docker + .env configured)
-make demo
-```
-
-Or run manually:
-
-```bash
-# 1. clone + install Python deps
-git clone https://github.com/k-arvanitis/echolog.git && cd echolog
+git clone https://github.com/k-arvanitis/echolog && cd echolog
 uv sync --extra dev
-
-# 2. install frontend deps
 cd frontend && npm install && cd ..
-
-# 3. configure secrets (GROQ_API_KEY, OPENAI_API_KEY, HF_TOKEN)
 cp .env.example .env && $EDITOR .env
-
-# 4. start Postgres / Redis / Qdrant + pull local embedding model
-make infra-up
 ollama pull nomic-embed-text
-
-# 5. run worker, API, and frontend in a tmux session
-make stack
-tmux attach -t echolog
 ```
-
-Open `http://localhost:3000` for the Echolog UI.
-The FastAPI backend lives at `http://localhost:8001` (Swagger docs at `/docs`).
 
 ---
 
-## Prerequisites
+## Quick Start
 
-| Tool | Minimum version | Purpose |
-|---|---|---|
-| Python | 3.12 | Backend runtime |
-| `uv` | latest | Python package management |
-| Node.js | 18 | Frontend runtime |
-| `npm` | 9+ | Frontend package management |
-| Docker + Docker Compose | latest | Postgres / Redis / Qdrant |
-| `ffmpeg` + `ffprobe` | 4.x | Audio normalization |
-| Ollama | latest | Local dense embeddings |
-| Hugging Face account | — | Accept `pyannote/speaker-diarization-3.1` gating; provide `HF_TOKEN` |
-| Groq API key | — | Whisper ASR + analytics + answer LLM |
-| OpenAI API key | — | RAG eval judge only (optional if you don't run eval) |
+```bash
+make stack     # Postgres + Redis + Qdrant + worker + api + ui in tmux (recommended)
+# — or run them in separate terminals:
+make infra-up  # Postgres + Redis + Qdrant
+make api       # FastAPI on :8001
+make worker    # Celery worker
+make ui        # Next.js on :3003
 
-> ⚠️ **Hugging Face gating required:** Before running Echolog, you must manually accept the model license at [pyannote/speaker-diarization-3.1](https://huggingface.co/pyannote/speaker-diarization-3.1).
-> This requires a HF account and can take a few minutes to be approved.
-> Without this step, the pipeline will fail with a 401 error on first run.
+make test      # 31 tests, all external services mocked
+make lint      # ruff check + ruff format --check
+make eval-ami  # AMI WER eval (English forced)
+make eval-rag  # RAG QA eval over the 50-question fixture
+```
+
+Open `http://localhost:3003` for the UI; interactive API docs at `http://localhost:8001/docs`.
+
+---
+
+## Example Questions
+
+The cross-meeting Ask panel handles questions across your meeting history; the per-meeting Ask tab restricts retrieval to one meeting.
+
+**Per-meeting**
+```
+What action items were assigned and to whom?
+What was decided about the roadmap?
+Why does the team want to revamp the kickoff format?
+```
+
+**Cross-meeting**
+```
+What did we decide about parking?
+When did we first discuss the training issue?
+Which meetings mentioned customer churn?
+What action items were assigned to Jason in the last quarter?
+Did we already agree on the rollout plan?
+```
 
 ---
 
@@ -259,84 +254,106 @@ All env vars in one place: `src/meeting_intelligence_engine/config.py`. Frontend
 
 | Variable | Default | Purpose |
 |---|---|---|
-| `GROQ_API_KEY` | — | **Required.** ASR + analytics + answer LLM. |
-| `OPENAI_API_KEY` | — | RAG eval judge. Not needed at runtime. |
-| `HF_TOKEN` | — | **Required.** Pyannote model download. |
-| `MIE_API_PORT` | `8001` | FastAPI port. |
-| `MIE_RELOAD` | `false` | Uvicorn auto-reload (dev only). |
-| `MIE_LOG_LEVEL` | `INFO` | Root log level. |
-| `MIE_API_KEY` | — | If set, side-effecting / paid-API endpoints require it in an `X-API-Key` header. Blank = open local dev. |
-| `MIE_CORS_ALLOW_ORIGINS` | `["http://localhost:3000","http://127.0.0.1:3000"]` | JSON list of allowed frontend origins. |
-| `MIE_ASR_MODEL_NAME` | `whisper-large-v3` | Groq Whisper model. |
-| `MIE_ASR_CHUNK_SECONDS` | `600` | Max seconds per ASR chunk. |
-| `MIE_DIARIZATION_MODEL_NAME` | `pyannote/speaker-diarization-3.1` | Diarization model. |
-| `MIE_LANGUAGE` | `en` | Force ASR language; `null` to auto-detect. |
-| `MIE_ANALYTICS_MODEL_NAME` | `llama-3.1-8b-instant` | Structured extraction model. |
-| `MIE_RAG_MODEL_NAME` | `llama-3.3-70b-versatile` | Answer generation model. |
-| `MIE_MAX_UPLOAD_MB` | `500` | Upload size cap. |
-| `MIE_MAX_DURATION_SECONDS` | `14400` | Reject audio longer than 4 hours. |
-| `MIE_DEFAULT_RETENTION_DAYS` | `90` | Default retention; `null` to disable. |
-| `MIE_DELETE_RAW_AUDIO_AFTER_PROCESSING` | `false` | Auto-purge raw audio once transcripts exist. |
-| `DATABASE_URL` | `postgresql+psycopg://mie:mie@localhost:55432/mie` | Postgres DSN. |
-| `REDIS_URL` | `redis://localhost:6379/0` | Celery broker. |
-| `QDRANT_URL` | `http://localhost:6333` | Vector store. |
-| `QDRANT_COLLECTION` | `meeting_transcript_md` | Collection name. |
-| `DENSE_MODEL` | `nomic-embed-text` | Ollama embedding model. |
-| `DENSE_DIM` | `768` | Embedding dimensionality. |
-| `SPARSE_MODEL` | `Qdrant/bm25` | Sparse encoder for hybrid retrieval. |
-| `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8001` | Frontend → backend URL (set in `frontend/.env.local`). |
+| `GROQ_API_KEY` | — | **Required.** ASR + analytics + answer LLM |
+| `OPENAI_API_KEY` | — | RAG eval judge only |
+| `HF_TOKEN` | — | **Required.** Pyannote model download |
+| `MIE_API_PORT` | `8001` | FastAPI port |
+| `MIE_API_KEY` | — | If set, side-effecting / paid-API endpoints require `X-API-Key` header. Blank = open local dev |
+| `MIE_CORS_ALLOW_ORIGINS` | `["http://localhost:3003","http://127.0.0.1:3003"]` | JSON list of allowed frontend origins |
+| `MIE_ASR_MODEL_NAME` | `whisper-large-v3` | Groq Whisper model |
+| `MIE_ASR_CHUNK_SECONDS` | `600` | Max seconds per ASR chunk |
+| `MIE_DIARIZATION_MODEL_NAME` | `pyannote/speaker-diarization-3.1` | Diarization model |
+| `MIE_LANGUAGE` | `en` | Force ASR language; `null` to auto-detect |
+| `MIE_ANALYTICS_MODEL_NAME` | `llama-3.1-8b-instant` | Structured extraction model |
+| `MIE_RAG_MODEL_NAME` | `llama-3.3-70b-versatile` | Answer generation model |
+| `MIE_MAX_UPLOAD_MB` | `500` | Upload size cap |
+| `MIE_MAX_DURATION_SECONDS` | `14400` | Reject audio longer than 4 hours |
+| `MIE_DEFAULT_RETENTION_DAYS` | `90` | Default retention; `null` to disable |
+| `MIE_DELETE_RAW_AUDIO_AFTER_PROCESSING` | `false` | Auto-purge raw audio once transcripts exist |
+| `DATABASE_URL` | `postgresql+psycopg://mie:mie@localhost:55432/mie` | Postgres DSN |
+| `REDIS_URL` | `redis://localhost:6379/0` | Celery broker |
+| `QDRANT_URL` | `http://localhost:6333` | Vector store |
+| `QDRANT_COLLECTION` | `meeting_transcript_md` | Collection name |
+| `DENSE_MODEL` | `nomic-embed-text` | Ollama embedding model |
+| `DENSE_DIM` | `768` | Embedding dimensionality |
+| `SPARSE_MODEL` | `Qdrant/bm25` | Sparse encoder for hybrid retrieval |
+| `NEXT_PUBLIC_API_URL` | `http://127.0.0.1:8001` | Frontend → backend URL (set in `frontend/.env.local`) |
 
-See `.env.example` for the full list with safe placeholder values.
+See `.env.example` for the full list with placeholder values.
 
 ---
 
-## Project Structure
+## Evaluation
 
-```text
-echolog/
-├── src/meeting_intelligence_engine/
-│   ├── api/                   # FastAPI: main.py (app factory + lifespan + error handler),
-│   │                          #   routes/ (meetings, query, privacy, system),
-│   │                          #   deps.py (DI: session, API-key guard), schemas.py
-│   ├── api/static/            # Built-in static UI (smoke testing)
-│   ├── workers/               # Celery tasks: transcribe, analytics, indexing
-│   ├── services/              # Pipeline stages: meetings, analytics,
-│   │                          #   speaker labels, segment repairs
-│   ├── rag/                   # Chunking, embeddings, ingestion, query
-│   ├── eval/                  # AMI WER + RAG eval harnesses
-│   ├── core/                  # Pydantic schemas, abstract interfaces
-│   ├── implementations/       # Concrete ASR + diarization adapters
-│   ├── audio.py / db.py / models.py / config.py / cli.py / exporters.py / logging_config.py / prompts.py
-│   └── __init__.py
-├── frontend/                  # Next.js 14 app router
-│   ├── app/                   # layout.tsx, page.tsx, globals.css
-│   ├── components/            # Sidebar, MeetingDetail, *Tab, CrossMeetingPanel
-│   ├── lib/api.ts             # Typed fetch + backend → frontend shape mapping
-│   └── lib/toast.tsx          # Lightweight toast system
-├── tests/
-│   ├── unit/                  # Pure logic: chunking, alignment, eval scoring, analytics
-│   ├── integration/           # FastAPI app + DB + ffmpeg, all external services mocked
-│   └── conftest.py            # `make_app` fixture (fresh app against temp SQLite)
-├── eval/
-│   ├── rag_qa/                # 50-question RAG fixture
-│   └── results/               # Eval outputs — published headline JSONs tracked, rest gitignored
-├── assets/                    # Screenshots / diagrams for the README
-├── .github/workflows/ci.yml   # ruff check + ruff format --check + pytest on every push
-├── Dockerfile / .dockerignore # Multi-stage runtime image (non-root) for API + worker
-├── docker-compose.yml         # Postgres / Redis / Qdrant
-├── Makefile                   # infra / api / worker / frontend / stack / test / lint / docker-build / eval-*
-├── pyproject.toml             # uv-managed, pinned Python ≥ 3.12, ruff config inline
-└── .env.example
+### ASR — AMI Meeting Corpus (Mix-Headset)
+
+Run on **30 / 30** AMI mix-headset meetings — multi-speaker, overlap, interruptions, conversational speech. The closest open benchmark to Echolog's real input.
+
+| Metric | Result |
+|---|---|
+| mean raw WER | **24.99%** |
+| mean filler-light WER | **20.65%** |
+| failed meetings | **0 / 30** |
+| best (`ES2016b`) | 19.22% raw / 15.20% filler-light |
+| worst (`ES2005a`) | 35.34% raw / 31.32% filler-light |
+
+`filler-light WER` strips obvious fillers (`uh`, `um`, `mm`) and immediate duplicates. Reported as a secondary metric because filler-heavy AMI annotations inflate raw WER without reflecting downstream usability.
+
+These numbers are higher than clean single-speaker benchmarks because this is **mixed multi-speaker headset audio**, not isolated speech. Even at 25% raw WER, the transcripts preserve enough signal for retrieval and analytics extraction — which is what the RAG eval measures next.
+
+```bash
+make eval-ami
+```
+
+### RAG — fixed QA set, RAGAS judge
+
+Run on a **50-question, 5-meeting** QA fixture (`eval/rag_qa/`), judged by `gpt-4.1-mini` via RAGAS.
+
+| Metric | Score |
+|---|---|
+| faithfulness | **94.0%** |
+| answer relevancy | 74.3% |
+| context precision | 78.2% |
+| context recall | 83.0% |
+
+**Reading the scores.** Faithfulness (94%) is the primary signal: Echolog answers from retrieved evidence and refuses when it can't, rather than hallucinating decisions or owners. Answer relevancy (74.3%) is bounded by meeting conversations being unstructured — queries that span multiple meetings return partial matches by design. Echolog is tuned to prefer narrow, correct retrieval over broad, noisy retrieval.
+
+All prompts live in `prompts.py` behind a `PROMPT_VERSION`; eval output records it (and runtime logs do too), so a quality number is always tied to the prompt that produced it.
+
+```bash
+make eval-rag
 ```
 
 ---
 
-## Two Query Modes
+## Failure Modes
 
-1. **Cross-meeting query** — `POST /query`. Hybrid retrieval over the entire meeting store. The right-pane chat in the UI. Primary product surface.
-2. **Single-meeting query** — `POST /meetings/{id}/query`. Same pipeline, restricted to one meeting via Qdrant payload filter. Drill-down for inspection or focused review.
+| Failure | Behaviour |
+|---|---|
+| Diarization splits a sentence across two speakers | `services/segment_repairs.py` — extend the rule set; check the broken-intro and leading-fragment patterns |
+| Speaker stays as `SPEAKER_03` | No self-introduction in audio. `services/speaker_labels.py` LLM fallback only fires with clear textual evidence; insert manual labels via DB if needed |
+| LLM returns malformed analytics JSON | `services/analytics.py` sanitize-and-coerce step runs automatically; topic-only fallback fires if the generic pass returns no topics |
+| Cross-meeting query returns nothing | Index never built or Ollama unreachable. Run `uv run mie-ingest-md --recreate data/meetings`; check the Qdrant collection exists |
+| Frontend can't reach backend | Toast: *"Backend offline — start the API server (`make api`)"*. API not running, or `MIE_CORS_ALLOW_ORIGINS` doesn't include the frontend origin |
+| Transcript is wrong language | Whisper auto-detected the wrong locale. Set `MIE_LANGUAGE=en` and re-process |
+| Pyannote 401 on first run | `HF_TOKEN` missing or hasn't accepted `pyannote/speaker-diarization-3.1` license |
 
-In practice, the value compounds the more meetings you store, because cross-meeting retrieval has more context to work with.
+---
+
+## Tests
+
+```bash
+make test
+```
+
+**31 tests**, no external services required — Groq, Qdrant, Ollama, ffmpeg, and the FastAPI surface are all mocked. CI runs `ruff check`, `ruff format --check`, and `pytest` on every push.
+
+| Path | What it tests |
+|---|---|
+| `tests/unit/test_pipeline.py` | Chunking, segment repair, analytics sanitizer, speaker-label validator, name-validator edge cases |
+| `tests/unit/test_eval.py` | WER scoring + RAG metric helpers |
+| `tests/integration/test_api.py` | FastAPI endpoints — upload, query, delete, retention, privacy purge |
+| `tests/conftest.py` | `make_app` fixture (fresh app + temp SQLite per test) |
 
 ---
 
@@ -362,7 +379,6 @@ GET    /meetings/{id}/topics
 
 POST   /meetings/{id}/query           ← single-meeting RAG                        · guarded
 POST   /query                         ← cross-meeting RAG                         · guarded
-POST   /knowledge/query               ← alias of /query                           · guarded
 
 POST   /meetings/{id}/retention                ← {retention_days}                 · guarded
 POST   /meetings/{id}/privacy/purge-raw-audio                                     · guarded
@@ -370,112 +386,76 @@ POST   /privacy/cleanup-expired                                                 
 GET    /privacy/settings
 ```
 
-`· guarded` endpoints require an `X-API-Key: <MIE_API_KEY>` header **when `MIE_API_KEY` is set** —
-they cause side effects or call paid APIs. With no key configured (the local-dev default) the guard is a no-op.
-
-Cross-meeting query example:
-
-```bash
-curl -X POST http://127.0.0.1:8001/query \
-  -H "Content-Type: application/json" \
-  -d '{"query":"What did we decide about performance?","top_k":5}'
-```
-
-Response shape:
-
-```json
-{
-  "answer": "...",
-  "sources": [
-    {
-      "meeting_title": "...",
-      "meeting_id": "...",
-      "content": "...",
-      "score": 0.83,
-      "speakers": ["Alice"],
-      "start_time": 142.7,
-      "end_time": 198.3
-    }
-  ],
-  "processing_time_ms": 1820
-}
-```
+`· guarded` endpoints require an `X-API-Key: <MIE_API_KEY>` header **when `MIE_API_KEY` is set** — they cause side effects or call paid APIs. With no key configured (local-dev default) the guard is a no-op.
 
 Manual full rebuild of the markdown index:
 
 ```bash
-uv run mie-ingest-md --recreate data/meetings data/md
+uv run mie-ingest-md --recreate data/meetings
 ```
 
 ---
 
-## CLI
+## Project Structure
 
-```bash
-# transcribe a single file end to end
-uv run meeting-transcribe \
-  --input samples/Product-Team-Meeting.mp3 \
-  --output-dir outputs
-
-# evaluation
-uv run mie-eval-ami --csv eval/results/ami.csv --json eval/results/ami.json
-uv run mie-eval-rag --qa-dir eval/rag_qa --json eval/results/rag_eval_results.json
 ```
-
----
-
-## Tests
-
-```bash
-make test     # pytest — 31 tests under tests/unit and tests/integration, all external services mocked
-make lint     # ruff check + ruff format --check
+echolog/
+├── src/meeting_intelligence_engine/
+│   ├── api/                   # FastAPI: main.py (app factory + lifespan + error handler),
+│   │                          #   routes/ (meetings, query, privacy, system),
+│   │                          #   deps.py (DI: session, API-key guard), schemas.py
+│   ├── api/static/            # Built-in static UI (smoke testing)
+│   ├── workers/               # Celery tasks: transcribe, analytics, indexing
+│   ├── services/              # Pipeline stages: meetings, analytics,
+│   │                          #   speaker labels, segment repairs
+│   ├── rag/                   # Chunking, embeddings, ingestion, query
+│   ├── eval/                  # AMI WER + RAG eval harnesses
+│   ├── core/                  # Pydantic schemas, abstract interfaces
+│   ├── implementations/       # Concrete ASR + diarization adapters
+│   ├── audio.py / db.py / models.py / config.py / cli.py / exporters.py / prompts.py
+│   └── __init__.py
+├── frontend/                  # Next.js 14 app router
+│   ├── app/                   # layout.tsx, page.tsx, globals.css
+│   ├── components/            # Sidebar, MeetingDetail, *Tab, CrossMeetingPanel
+│   ├── lib/api.ts             # Typed fetch + backend → frontend shape mapping
+│   └── lib/toast.tsx          # Lightweight toast system
+├── tests/
+│   ├── unit/                  # Pure logic: chunking, alignment, eval scoring, analytics
+│   ├── integration/           # FastAPI app + DB + ffmpeg, all external services mocked
+│   └── conftest.py            # `make_app` fixture (fresh app against temp SQLite)
+├── eval/
+│   ├── rag_qa/                # 50-question RAG fixture
+│   └── results/               # Eval outputs — published headline JSONs tracked
+├── assets/                    # demo.mp4 + analytics.png + ask.png for the README
+├── .github/workflows/ci.yml   # ruff check + ruff format --check + pytest on every push
+├── Dockerfile / .dockerignore # Multi-stage runtime image (non-root) for API + worker
+├── docker-compose.yml         # Postgres / Redis / Qdrant
+├── Makefile                   # infra / api / worker / ui / stack / test / lint / docker-build / eval-*
+├── pyproject.toml             # uv-managed, pinned Python ≥ 3.12, ruff config inline
+└── .env.example
 ```
-
-CI runs lint, format-check, and tests on every push to `main` and every PR.
 
 ---
 
 ## Known Limitations
 
 - **Single-tenant.** No real auth or workspace isolation. The optional `MIE_API_KEY` header guard is a coarse stopgap on side-effecting / paid-API endpoints — and the Next.js UI doesn't send it, so enabling it currently locks the UI out of upload/query/delete. Anyone with API access can read every meeting.
-- **No live capture.** Batch upload only; Zoom-bot integration is in the spec but not wired up.
+- **No live capture.** Batch upload only. Zoom / Meet / Teams bot integration is in the spec but not wired up.
 - **Diarization fragility.** Overlapping speech, remote-call compression, and inconsistent mic quality degrade segmentation. Repair heuristics catch the most common cases but are not a learned correction layer.
-- **Speaker naming requires self-introduction.** If no one says "this is Alice", the rule-based pass leaves `SPEAKER_03`. The LLM fallback only fires when there's clear textual evidence; nicknames and indirect references aren't normalized.
-- **Filler-heavy AMI annotations.** Raw WER is harsher than what the transcripts actually look like to a reader. We report filler-light WER as a secondary metric for that reason.
-- **Object storage / production deployment** not packaged. Repo is a runnable prototype on a single machine.
+- **Speaker naming requires self-introduction.** If no one says *"this is Alice"* on the call, the rule pass leaves `SPEAKER_03` and the LLM fallback won't fire without clear textual evidence. Nicknames and indirect references aren't normalized.
+- **Filler-heavy AMI annotations.** Raw WER is harsher than what the transcripts actually look like to a reader. Filler-light WER reported as a secondary metric for that reason.
+- **No schema migrations.** `db.py` runs a small idempotent column-add shim on startup; Alembic is the next step.
+- **Object storage / production deployment not packaged.** Repo is a runnable prototype on a single machine. HTTPS, reverse proxy, encryption at rest, KMS-managed keys, formal audit logging, participant consent capture, and PII redaction are deliberate next-product concerns — not hidden gaps.
 
 ---
 
-## Failure Modes
+## About the Author
 
-| What breaks | Symptom | Where to look |
-|---|---|---|
-| Diarization splits a sentence across two speakers | Transcript has fragments attributed to the wrong person | `services/segment_repairs.py` — extend the rule set; check for the broken-intro and leading-fragment patterns |
-| Speaker stays as `SPEAKER_03` | No self-introduction in the audio | `services/speaker_labels.py` — LLM fallback only fires with clear textual evidence; inject manual labels via DB if needed |
-| LLM returns malformed JSON for analytics | Empty action items / decisions for a meeting | `services/analytics.py` — sanitize-and-coerce step; topic-only fallback pass runs if the generic pass returns no topics |
-| Cross-meeting query returns nothing | Index never built or Ollama unreachable | Check `MIE_RAG_ENABLED`, run `mie-ingest-md --recreate data/meetings data/md`, verify Qdrant collection exists |
-| Frontend can't reach backend | Toast: "Backend offline — start the API server" | API not running, or `MIE_CORS_ALLOW_ORIGINS` doesn't include the frontend origin |
-| Transcript is wrong language | Whisper auto-detected the wrong locale | Set `MIE_LANGUAGE=en` (or your target) and re-process |
-| Pyannote download fails | 401 on first run | `HF_TOKEN` missing or hasn't accepted `pyannote/speaker-diarization-3.1` model card |
+AI engineer specialising in RAG systems, audio pipelines, and agentic workflows.
 
----
-
-## Out of Scope
-
-The current repo is a strong end-to-end prototype. The items below are deliberate next-product concerns, not hidden gaps:
-
-- real authentication and workspace isolation (the `X-API-Key` guard is a coarse stopgap, not user auth);
-- HTTPS, reverse proxy, production deployment hardening;
-- encryption at rest, KMS-managed keys, formal audit logging;
-- participant consent capture and recording disclosure;
-- PII redaction beyond manual retention controls;
-- Zoom / Meet / Teams live-capture bots;
-- object storage (S3 / MinIO) instead of local filesystem;
-- proper schema migrations — `db.py` runs a small idempotent column-add shim on startup; Alembic is the next step.
-
----
-
-## Contact
-
-- GitHub: [k-arvanitis](https://github.com/k-arvanitis)
+- GitHub: https://github.com/k-arvanitis
+- LinkedIn: https://www.linkedin.com/in/konstantinos-arvanitis-0248b3246/
 - Email: konstantinos.arvanitis@outlook.com
+- Upwork: https://www.upwork.com/freelancers/~01dffea4a9afbdc9f6
+
+Open to freelance and contract work on RAG / agent / audio-intelligence systems — get in touch if you want one built for your business.
