@@ -15,6 +15,7 @@ from meeting_intelligence_engine.config import Settings, settings
 from meeting_intelligence_engine.core.schemas import AnalyticsResult
 from meeting_intelligence_engine.models import ActionItem, Decision, Topic, TranscriptSegment
 from meeting_intelligence_engine.services.meetings import get_meeting, mark_meeting_completed
+from meeting_intelligence_engine.services.speaker_labels import _looks_like_person_name, _normalize_name
 
 logger = logging.getLogger(__name__)
 
@@ -149,6 +150,18 @@ def _coerce_string_list(value: object) -> list[str]:
     return [coerced] if coerced else []
 
 
+def _sanitize_person_name(raw: object) -> str | None:
+    name = _coerce_string(raw)
+    if not name:
+        return None
+    normalized = _normalize_name(name)
+    return normalized if _looks_like_person_name(normalized) else None
+
+
+def _sanitize_person_names(values: list[str]) -> list[str]:
+    return [n for n in (_sanitize_person_name(v) for v in values) if n]
+
+
 def sanitize_analytics_payload(payload: object) -> dict:
     if not isinstance(payload, dict):
         return {}
@@ -158,7 +171,7 @@ def sanitize_analytics_payload(payload: object) -> dict:
             action_items.append(
                 {
                     "description": _coerce_string(item.get("description"), "") or "",
-                    "assignee_inferred": _coerce_string(item.get("assignee_inferred")),
+                    "assignee_inferred": _sanitize_person_name(item.get("assignee_inferred")),
                     "deadline": _coerce_string(item.get("deadline")),
                     "priority": _coerce_string(item.get("priority"), "medium") or "medium",
                     "confidence": _coerce_float(item.get("confidence")) or 0.0,
@@ -173,7 +186,7 @@ def sanitize_analytics_payload(payload: object) -> dict:
                 {
                     "decision_text": _coerce_string(decision.get("decision_text"), "") or "",
                     "context": _coerce_string(decision.get("context")),
-                    "stakeholders": _coerce_string_list(decision.get("stakeholders")),
+                    "stakeholders": _sanitize_person_names(_coerce_string_list(decision.get("stakeholders"))),
                     "timestamp": _coerce_float(decision.get("timestamp")),
                     "confidence": _coerce_float(decision.get("confidence")) or 0.0,
                 }

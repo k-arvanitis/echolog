@@ -10,7 +10,7 @@ help:
 	@echo "  make infra-logs    # tail docker service logs"
 	@echo "  make api           # run FastAPI app on :8001"
 	@echo "  make worker        # run Celery worker"
-	@echo "  make ui            # run Next.js dev server on :3000"
+	@echo "  make ui            # run Next.js dev server on :3003"
 	@echo "  make stack         # start infra, worker, and api in tmux"
 	@echo "  make test          # run pytest"
 	@echo "  make lint          # run ruff check + ruff format --check"
@@ -26,16 +26,16 @@ demo: infra-up
 		tmux has-session -t echolog 2>/dev/null && tmux kill-session -t echolog || true; \
 		tmux new-session -d -s echolog 'cd $(CURDIR) && uv run meeting-worker'; \
 		tmux split-window -t echolog 'cd $(CURDIR) && uv run meeting-api'; \
-		tmux split-window -t echolog 'cd $(CURDIR)/frontend && npm run dev'; \
+		tmux split-window -t echolog 'cd $(CURDIR)/frontend && npm run dev -- -p 3003'; \
 		tmux select-layout -t echolog tiled; \
 		echo "tmux session started: echolog (attach with: tmux attach -t echolog)"; \
 	else \
 		echo "tmux not found — run each service in its own terminal:"; \
 		echo "  uv run meeting-worker"; \
 		echo "  uv run meeting-api"; \
-		echo "  (cd frontend && npm run dev)"; \
+		echo "  (cd frontend && npm run dev -- -p 3003)"; \
 	fi
-	@echo "Open http://localhost:3000"
+	@echo "Open http://localhost:3003"
 
 infra-up:
 	docker compose up -d postgres redis qdrant
@@ -53,13 +53,13 @@ worker:
 	uv run meeting-worker
 
 ui:
-	cd frontend && npm run dev
+	cd frontend && npm run dev -- -p 3003
 
 stack: infra-up
 	@tmux has-session -t echolog 2>/dev/null && tmux kill-session -t echolog || true
 	tmux new-session -d -s echolog 'cd $(CURDIR) && uv run meeting-worker'
 	tmux split-window -t echolog 'cd $(CURDIR) && uv run meeting-api'
-	tmux split-window -t echolog 'cd $(CURDIR)/frontend && npm run dev'
+	tmux split-window -t echolog 'cd $(CURDIR)/frontend && npm run dev -- -p 3003'
 	tmux select-layout -t echolog tiled
 	@echo "tmux session started: echolog"
 	@echo "attach with: tmux attach -t echolog"

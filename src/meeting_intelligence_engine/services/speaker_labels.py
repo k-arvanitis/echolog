@@ -53,7 +53,82 @@ NON_PERSON_TOKENS = {
     "hr",
     "human",
     "resources",
+    "in",
+    "on",
+    "at",
+    "to",
+    "of",
+    "for",
+    "with",
+    "by",
+    "from",
+    "as",
+    "and",
+    "or",
+    "but",
+    "if",
+    "not",
+    "is",
+    "are",
+    "was",
+    "were",
+    "be",
+    "been",
+    "being",
+    "have",
+    "has",
+    "had",
+    "do",
+    "does",
+    "did",
+    "will",
+    "would",
+    "should",
+    "could",
+    "can",
+    "may",
+    "might",
+    "must",
+    "going",
+    "update",
+    "line",
+    "out",
+    "up",
+    "down",
+    "off",
+    "over",
+    "under",
+    "again",
+    "more",
+    "less",
+    "now",
+    "then",
+    "here",
+    "there",
+    "where",
+    "when",
+    "how",
+    "why",
+    "who",
+    "what",
+    "which",
+    "this",
+    "that",
+    "these",
+    "those",
+    "all",
+    "any",
+    "some",
+    "no",
+    "yes",
+    "ok",
+    "okay",
+    "yeah",
+    "uh",
+    "um",
 }
+
+_NAME_TOKEN_RE = re.compile(r"^[A-Z][a-zA-Z'\-]{1,}$")
 
 
 @dataclass
@@ -73,12 +148,11 @@ def _normalize_name(name: str) -> str:
 
 def _looks_like_person_name(name: str) -> bool:
     tokens = [token.strip(".,") for token in name.split() if token.strip(".,")]
-    if not tokens:
+    if not tokens or len(tokens) > 3:
         return False
-    lowered = [token.lower() for token in tokens]
-    if lowered[0] in {"the", "a", "an"}:
+    if any(token.lower() in NON_PERSON_TOKENS for token in tokens):
         return False
-    if all(token in NON_PERSON_TOKENS for token in lowered):
+    if not all(_NAME_TOKEN_RE.match(token) for token in tokens):
         return False
     return True
 
@@ -236,7 +310,15 @@ def _fallback_candidates_with_llm(
             evidence_text=evidence_text,
             evidence_start_time=None,
         )
-    return resolved
+
+    name_counts: dict[str, int] = {}
+    for candidate in resolved.values():
+        name_counts[candidate.speaker_name] = name_counts.get(candidate.speaker_name, 0) + 1
+    deduped = {sid: c for sid, c in resolved.items() if name_counts[c.speaker_name] == 1}
+    dropped = len(resolved) - len(deduped)
+    if dropped:
+        logger.info("dropped %d speaker label(s) due to duplicate-name conflict", dropped)
+    return deduped
 
 
 def infer_speaker_labels(transcript: TranscriptResult, config: Settings = settings) -> dict[str, SpeakerLabelCandidate]:

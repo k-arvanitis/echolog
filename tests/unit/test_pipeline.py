@@ -130,7 +130,8 @@ def test_sanitize_analytics_payload_coerces_sloppy_llm_types() -> None:
 
     assert result.action_items[0].priority == "medium"
     assert result.action_items[0].timestamp is None
-    assert result.decisions[0].stakeholders == ["Management", "staff"]
+    assert result.decisions[0].stakeholders == ["Management"]
+    assert result.action_items[0].assignee_inferred is None
     assert result.decisions[0].timestamp == 24.9
     assert result.topics[0].start_time == 24.9
     assert result.topics[0].keywords == ["parking", "reimbursement"]

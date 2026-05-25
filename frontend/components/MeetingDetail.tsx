@@ -97,13 +97,13 @@ export default function MeetingDetail({ meeting, onDelete, onMeetingUpdated }: P
         </TabsList>
 
         <TabsContent value="overview" className="mt-0 min-h-0 flex-1 overflow-y-auto bg-ink-50">
-          <OverviewTab meetingId={meeting.id} />
+          <OverviewTab key={`${meeting.id}-${meeting.status}`} meetingId={meeting.id} />
         </TabsContent>
         <TabsContent value="transcript" className="mt-0 min-h-0 flex-1 overflow-hidden bg-ink-50">
-          <TranscriptTab meetingId={meeting.id} />
+          <TranscriptTab key={`${meeting.id}-${meeting.status}`} meetingId={meeting.id} />
         </TabsContent>
         <TabsContent value="analytics" className="mt-0 min-h-0 flex-1 overflow-y-auto bg-ink-50">
-          <AnalyticsTab meetingId={meeting.id} />
+          <AnalyticsTab key={`${meeting.id}-${meeting.status}`} meetingId={meeting.id} />
         </TabsContent>
         <TabsContent value="ask" className="mt-0 min-h-0 flex-1 overflow-hidden bg-ink-50">
           <AskTab meetingId={meeting.id} />

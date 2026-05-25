@@ -45,15 +45,25 @@ def recursive_chunks(text: str, chunk_size: int = 1200, overlap: int = 150) -> l
             chunks.append((chunk, start, end))
         if end >= len(text):
             break
-        start = max(0, end - overlap)
+        next_start = max(0, end - overlap)
+        snap_para = text.find("\n\n", next_start, end)
+        if snap_para != -1:
+            next_start = snap_para + 2
+        else:
+            snap_sentence = text.find(". ", next_start, end)
+            if snap_sentence != -1:
+                next_start = snap_sentence + 2
+            else:
+                next_start = end
+        start = next_start
     return chunks
 
 
 def best_split(text: str, start: int, hard_end: int) -> int:
     window = text[start:hard_end]
-    for separator in ["\n\n", "\n", ". ", " "]:
+    for separator, min_pos in [("\n\n", 200), ("\n", 400), (". ", 600), (" ", 800)]:
         index = window.rfind(separator)
-        if index >= max(200, len(window) // 2):
+        if index >= min_pos:
             return start + index + len(separator)
     return hard_end
 

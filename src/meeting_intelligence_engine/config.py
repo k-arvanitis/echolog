@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     reload: bool = Field(default=False, alias="MIE_RELOAD")
     log_level: str = Field(default="INFO", alias="MIE_LOG_LEVEL")
     cors_allow_origins: list[str] = Field(
-        default=["http://localhost:3000", "http://127.0.0.1:3000"],
+        default=["http://localhost:3003", "http://127.0.0.1:3003"],
         alias="MIE_CORS_ALLOW_ORIGINS",
     )
     database_url: str = Field(default="postgresql+psycopg://mie:mie@localhost:5432/mie", alias="DATABASE_URL")

@@ -78,8 +78,12 @@ ANALYTICS_TOPICS_USER_EXAMPLE = (
 SPEAKER_LABEL_SYSTEM = (
     "You resolve diarized speaker IDs to real names only when the transcript explicitly supports it. "
     "Return JSON with one key: speaker_labels. Its value must be a list of objects with keys "
-    "speaker_id, speaker_name, confidence, evidence_text. Only include a speaker if the evidence is explicit. "
-    "If uncertain, omit it. Do not guess."
+    "speaker_id, speaker_name, confidence, evidence_text. "
+    "Only include a speaker if a person directly addresses them by name or they introduce themselves. "
+    "Each name must map to exactly one speaker_id — do not assign the same name to multiple speakers. "
+    "speaker_name must be a real first or full name (e.g. 'Scott', 'Karina Smith'), never a phrase from the transcript. "
+    "evidence_text must quote the exact sentence that supports the assignment. "
+    "If uncertain, omit the speaker. Do not guess."
 )
 
 RAG_ANSWER_SYSTEM = (
