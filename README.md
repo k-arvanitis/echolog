@@ -24,10 +24,9 @@ Built for teams that record every meeting and want institutional memory — not 
 
 <!-- After pushing, drop assets/demo.mp4 into the GitHub README editor to get a https://github.com/user-attachments/assets/<uuid> URL and replace the line below. -->
 
-<video src="https://github.com/k-arvanitis/echolog/raw/main/assets/demo.mp4" controls width="100%"></video>
 
-> 60-second tour — upload, transcribe, browse analytics, ask grounded questions.
-> If the embed doesn't render, [download `assets/demo.mp4`](assets/demo.mp4) directly.
+https://github.com/user-attachments/assets/3a30c241-c184-4693-8f59-bd3534810cf4
+
 
 | Analytics — action items, decisions, topics | Ask — grounded answers with citations |
 |---|---|
