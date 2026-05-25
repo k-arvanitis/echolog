@@ -22,11 +22,7 @@ Built for teams that record every meeting and want institutional memory — not 
 
 ## Demo
 
-<!-- After pushing, drop assets/demo.mp4 into the GitHub README editor to get a https://github.com/user-attachments/assets/<uuid> URL and replace the line below. -->
-
-
 https://github.com/user-attachments/assets/3a30c241-c184-4693-8f59-bd3534810cf4
-
 
 | Analytics — action items, decisions, topics | Ask — grounded answers with citations |
 |---|---|
@@ -183,6 +179,9 @@ The value compounds the more meetings you store: cross-meeting retrieval has mor
 ## Setup
 
 ### Prerequisites
+
+> **TL;DR.** All infrastructure (Postgres, Redis, Qdrant) runs in Docker. The only host-level dependencies are Docker, `uv`, Node 18, and Ollama — plus a Groq API key and Hugging Face token for the gated diarization model.
+
 - Python 3.12, [`uv`](https://docs.astral.sh/uv/)
 - Node.js ≥ 18, `npm`
 - Docker + Docker Compose (Postgres / Redis / Qdrant)
@@ -311,11 +310,13 @@ Run on a **50-question, 5-meeting** QA fixture (`eval/rag_qa/`), judged by `gpt-
 | Metric | Score |
 |---|---|
 | faithfulness | **94.0%** |
-| answer relevancy | 74.3% |
+| answer relevancy \* | 74.3% |
 | context precision | 78.2% |
 | context recall | 83.0% |
 
-**Reading the scores.** Faithfulness (94%) is the primary signal: Echolog answers from retrieved evidence and refuses when it can't, rather than hallucinating decisions or owners. Answer relevancy (74.3%) is bounded by meeting conversations being unstructured — queries that span multiple meetings return partial matches by design. Echolog is tuned to prefer narrow, correct retrieval over broad, noisy retrieval.
+> \* Answer relevancy is bounded by meeting conversations being unstructured — questions spanning multiple meetings return partial matches by design. Echolog is tuned to prefer narrow, correct retrieval over broad, noisy retrieval.
+
+**Reading the scores.** Faithfulness (94%) is the primary signal: Echolog answers from retrieved evidence and refuses when it can't, rather than hallucinating decisions or owners.
 
 All prompts live in `prompts.py` behind a `PROMPT_VERSION`; eval output records it (and runtime logs do too), so a quality number is always tied to the prompt that produced it.
 
@@ -438,7 +439,7 @@ echolog/
 
 ## Known Limitations
 
-- **Single-tenant.** No real auth or workspace isolation. The optional `MIE_API_KEY` header guard is a coarse stopgap on side-effecting / paid-API endpoints — and the Next.js UI doesn't send it, so enabling it currently locks the UI out of upload/query/delete. Anyone with API access can read every meeting.
+- **Single-tenant prototype.** Multi-tenant auth and workspace isolation are out of scope for this version. The optional `MIE_API_KEY` header guard is a coarse stopgap on side-effecting / paid-API endpoints; the Next.js UI doesn't send it, so enabling it currently locks the UI out of upload/query/delete.
 - **No live capture.** Batch upload only. Zoom / Meet / Teams bot integration is in the spec but not wired up.
 - **Diarization fragility.** Overlapping speech, remote-call compression, and inconsistent mic quality degrade segmentation. Repair heuristics catch the most common cases but are not a learned correction layer.
 - **Speaker naming requires self-introduction.** If no one says *"this is Alice"* on the call, the rule pass leaves `SPEAKER_03` and the LLM fallback won't fire without clear textual evidence. Nicknames and indirect references aren't normalized.
@@ -448,13 +449,8 @@ echolog/
 
 ---
 
-## About the Author
-
-AI engineer specialising in RAG systems, audio pipelines, and agentic workflows.
+## Contact
 
 - GitHub: https://github.com/k-arvanitis
 - LinkedIn: https://www.linkedin.com/in/konstantinos-arvanitis-0248b3246/
 - Email: konstantinos.arvanitis@outlook.com
-- Upwork: https://www.upwork.com/freelancers/~01dffea4a9afbdc9f6
-
-Open to freelance and contract work on RAG / agent / audio-intelligence systems — get in touch if you want one built for your business.
