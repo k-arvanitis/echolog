@@ -451,6 +451,8 @@ echolog/
 
 ## Contact
 
-- GitHub: https://github.com/k-arvanitis
-- LinkedIn: https://www.linkedin.com/in/konstantinos-arvanitis-0248b3246/
+Built by Konstantinos Arvanitis — AI engineer.
+
+- [LinkedIn](https://www.linkedin.com/in/konstantinos-arvanitis-0248b3246/)
+- [GitHub](https://github.com/k-arvanitis)
 - Email: konstantinos.arvanitis@outlook.com
