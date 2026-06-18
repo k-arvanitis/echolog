@@ -26,3 +26,7 @@ eval/results/*
 
 # Local sample media
 samples/
+
+# Local dev context
+CLAUDE.md
+TODO.md

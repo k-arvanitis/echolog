@@ -451,7 +451,7 @@ echolog/
 
 ## Contact
 
-Built by Konstantinos Arvanitis — AI engineer.
+Built by Konstantinos Arvanitis — AI engineer & automation specialist.
 
 - [LinkedIn](https://www.linkedin.com/in/konstantinos-arvanitis-0248b3246/)
 - [GitHub](https://github.com/k-arvanitis)
